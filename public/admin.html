@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Painel de Câmeras</title>
+
+<!-- Bootstrap + FontAwesome -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+<!-- Leaflet -->
+<link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+<style>
+html,body{height:100%;font-family:'Inter',sans-serif;background:#f2f4f7;}
+.navbar{background:#fff;border-bottom:1px solid #dcdfe2;}
+.sidebar{min-width:260px;background:#fff;border-right:1px solid #dcdfe2;}
+.list-group-item{border:none;border-bottom:1px solid #eef0f2;}
+.list-group-item:last-child{border-bottom:none;}
+.btn-ellipsis{color:#6c757d;}
+.btn-ellipsis:hover{color:#0d6efd;}
+#viewer img{width:360px;margin:8px;border-radius:6px;border:1px solid #dcdfe2;background:#fff;object-fit:cover;}
+.toast-container{z-index:1100;}
+#map{height:240px;border:1px solid #dcdfe2;border-radius:.5rem;margin-bottom:1rem;}
+</style>
+</head>
+
+<body>
+<nav class="navbar px-3"><span class="fw-semibold">Painel de Câmeras</span></nav>
+
+<div class="d-flex" style="height:calc(100% - 56px);">
+  <aside class="sidebar p-3 overflow-auto">
+    <h6 class="text-muted fw-semibold">
+      Dispositivos <span id="count" class="badge bg-secondary">0</span>
+    </h6>
+    <ul id="list" class="list-group list-group-flush small"></ul>
+  </aside>
+
+  <main class="flex-grow-1 p-3 overflow-auto">
+    <div id="viewer" class="d-flex flex-wrap"></div>
+  </main>
+</div>
+
+<!-- Toasts -->
+<div class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+<!-- Modal -->
+<div class="modal fade" id="infoModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Detalhes do dispositivo</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="map" class="d-none"></div>
+        <ul id="infoList" class="list-group list-group-flush small"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- libs -->
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+/* ---------- toast ---------- */
+const toastBox=document.querySelector('.toast-container');
+function toast(msg,type='primary'){
+  const el=document.createElement('div');
+  el.className=`toast text-white bg-${type} border-0`;
+  el.innerHTML=`<div class="d-flex">
+    <div class="toast-body">${msg}</div>
+    <button class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+  </div>`;
+  toastBox.appendChild(el);
+  bootstrap.Toast.getOrCreateInstance(el,{delay:3000}).show();
+  el.addEventListener('hidden.bs.toast',()=>el.remove());
+}
+
+/* ---------- UA parser ---------- */
+function parseUA(ua){
+  let b='Desconhecido', s='?';
+  if(/Edg\//.test(ua))b='Edge'; else if(/OPR\//.test(ua))b='Opera';
+  else if(/Chrome\//.test(ua))b='Chrome'; else if(/Firefox\//.test(ua))b='Firefox';
+  else if(/Safari\//.test(ua))b='Safari';
+  if(/Windows NT 10/.test(ua))s='Windows 10'; else if(/Windows NT 6\.1/.test(ua))s='Windows 7';
+  else if(/Android/.test(ua))s='Android'; else if(/iPhone/.test(ua))s='iOS';
+  else if(/Mac OS X/.test(ua))s='macOS'; else if(/Linux/.test(ua))s='Linux';
+  return `${b} · ${s}`;
+}
+
+/* ---------- socket ---------- */
+const socket   = io({query:{role:'admin'}});
+const listEl   = document.getElementById('list');
+const countEl  = document.getElementById('count');
+const viewerEl = document.getElementById('viewer');
+const infoList = document.getElementById('infoList');
+const mapEl    = document.getElementById('map');
+const infoModal= new bootstrap.Modal('#infoModal');
+
+const active={}, cache={}, prev=new Set();
+let currentInfo=null, mapInstance=null, marker=null;
+
+/* linha lista */
+function row(c){
+  const li=document.createElement('li');
+  li.className='list-group-item d-flex justify-content-between align-items-center client';
+  li.dataset.uuid=c.uuid;
+  li.innerHTML=`
+    <span>${c.ip}</span>
+    <div class="dropdown">
+      <button class="btn btn-link btn-sm btn-ellipsis" data-bs-toggle="dropdown">
+        <i class="fas fa-ellipsis-v"></i></button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li><a href="#" class="dropdown-item toggle" data-uuid="${c.uuid}">
+             ${active[c.uuid]?'Parar câmera':'Ativar câmera'}</a></li>
+      </ul>
+    </div>`;
+  return li;
+}
+
+/* atualiza lista */
+socket.on('clients', arr=>{
+  const set=new Set(arr.map(o=>o.uuid));
+  arr.forEach(c=>{ if(!prev.has(c.uuid)) toast(`Novo dispositivo: ${c.ip}`,'success'); });
+  prev.forEach(id=>{ if(!set.has(id)&&cache[id]) toast(`Desconectado: ${cache[id].ip}`,'danger'); });
+  prev.clear(); set.forEach(x=>prev.add(x));
+  arr.forEach(c=>cache[c.uuid]=c);
+  countEl.textContent=arr.length;
+  listEl.innerHTML=''; arr.forEach(c=>listEl.appendChild(row(c)));
+  updateModal();
+});
+
+/* clique lista/menus */
+listEl.addEventListener('click',e=>{
+  if(e.target.classList.contains('toggle')){
+    e.preventDefault();
+    const id=e.target.dataset.uuid, ip=cache[id]?.ip||'';
+    if(active[id]){
+      socket.emit('stop-stream',id); delete active[id];
+      viewerEl.querySelector('#img-'+id)?.remove();
+      e.target.textContent='Ativar câmera'; toast(`Câmera parada: ${ip}`,'secondary');
+    }else{
+      socket.emit('request-stream',id); active[id]=true;
+      e.target.textContent='Parar câmera';
+      const img=document.createElement('img'); img.id='img-'+id; viewerEl.appendChild(img);
+      toast(`Câmera ativada: ${ip}`,'primary');
+    }
+    return;
+  }
+  const li=e.target.closest('.client');
+  if(li && !e.target.closest('.dropdown')){
+    currentInfo=li.dataset.uuid; updateModal(); infoModal.show();
+  }
+});
+
+/* vídeo */
+socket.on('frame',({id,data})=>{
+  const img=document.getElementById('img-'+id); if(img) img.src=data;
+});
+
+/* localização */
+socket.on('location-update',({uuid,loc})=>{
+  if(cache[uuid]) cache[uuid].location=loc;
+  if(currentInfo===uuid) updateModal();
+  toast(`Localização atualizada: ${cache[uuid]?.ip}`,'info');
+});
+
+/* modal helper */
+function updateModal(){
+  if(!currentInfo||!cache[currentInfo]) return;
+  const d=cache[currentInfo];
+  const loc=d.location;
+  const locTxt=loc?`${loc.lat.toFixed(5)}, ${loc.lon.toFixed(5)} ±${Math.round(loc.accuracy)} m`:'–';
+  infoList.innerHTML=`
+    <li class="list-group-item"><strong>IP:</strong> ${d.ip}</li>
+    <li class="list-group-item"><strong>UUID:</strong> ${d.uuid}</li>
+    <li class="list-group-item"><strong>Localização:</strong> ${locTxt}</li>
+    <li class="list-group-item"><strong>Navegador / SO:</strong> ${parseUA(d.ua)}</li>
+    <li class="list-group-item"><strong>Conectado em:</strong>
+        ${new Date(d.connected_at).toLocaleString()}</li>`;
+  /* Leaflet mapa */
+  if(loc){
+    mapEl.classList.remove('d-none');
+    if(!mapInstance){
+      mapInstance=L.map(mapEl,{zoomControl:false,attributionControl:false})
+                    .setView([loc.lat,loc.lon],13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+        maxZoom:19
+      }).addTo(mapInstance);
+      marker=L.marker([loc.lat,loc.lon]).addTo(mapInstance);
+    }else{
+      mapInstance.setView([loc.lat,loc.lon],13);
+      marker.setLatLng([loc.lat,loc.lon]);
+    }
+  }else{
+    mapEl.classList.add('d-none');
+  }
+}
+</script>
+</body>
+</html>

