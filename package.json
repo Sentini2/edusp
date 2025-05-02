@@ -1,23 +1,18 @@
 {
-  "name": "captura-app",
+  "name": "camera-server",
   "version": "1.0.0",
-  "description": "Captura de câmera + painel admin",
-  "type": "module",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js",          // ← Railway procura este
-    "dev":   "nodemon server.js",
-    "make":  "electron-builder --windows portable"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "dependencies": {
-    "express": "^4.19.2",
-    "socket.io": "^4.7.5",
-    "uuid": "^9.0.0"
-  },
-  "devDependencies": {
-    "electron": "^30.1.1",
-    "electron-builder": "^26.0.14",
-    "nodemon": "^3.1.0"
-  },
-  "engines": { "node": ">=18" }
+    "better-sqlite3": "^11.9.1",
+    "express": "^5.1.0",
+    "socket.io": "^4.8.1",
+    "uuid": "^11.1.0"
+  }
 }
