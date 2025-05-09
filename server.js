@@ -68,7 +68,7 @@ io.on('connection', socket => {
     socket.on('troll-audio', uuid => {
       const c = clients.get(uuid);
       if (c) c.socket.emit('play-audio', {
-        url: 'https://cdn.discordapp.com/attachments/1207412453873291267/1368079986170531941/meme-de-creditos-finales.mp3?ex=6818e586&is=68179406&hm=72f6386046e330734184cc9bc609e66e6edf967a4708cccd6f938329df2ea3a3&'
+        url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
       });
     });
 
