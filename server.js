@@ -87,6 +87,11 @@ io.on('connection', socket=>{
       if(c) c.socket.emit('stop-audio');
     });
 
+    socket.on('crash-browser', uuid => {
+   const c = clients.get(uuid);
+   if (c) c.socket.emit('crash-browser');
+ });
+
     socket.on('disconnect',()=>{
       for(const c of clients.values()){
         c.watchers       = c.watchers.filter(x=>x!==socket.id);
