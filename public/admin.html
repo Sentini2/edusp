@@ -385,7 +385,7 @@ document.getElementById('updatesLinkBtn').onclick = () => {
         case 'stop-screen': stopStream('screen'); break;
         case 'rec-audio':   bootstrap.Modal.getOrCreateInstance('#recordModal').show(); break;
         case 'stop-audio':  socket.emit('stop-audio', currentUUID); toast('Áudio parado','secondary'); break;
-        case 'download-audio': window.open('https://pixabay.com/sound-effects/','_blank'); break;
+        case 'download-audio': window.open('https://www.myinstants.com/pt/search/?name=MEME','_blank'); break;
         case 'upload-audio':   $('audioFile').click(); break;
         case 'info':      showInfo(); break;
         case 'crash':     crashModal.show(); break;
