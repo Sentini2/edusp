@@ -13,6 +13,8 @@
 
 
 
+
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -154,11 +156,62 @@
 
 
 <video id="video" playsinline autoplay muted style="display:none"></video>
-<audio id="trollAudio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+<audio id="troll-audio" src="https://actions.google.com/sounds/v1/ambiences/subway_station_nyc.ogg"></audio>
+
 
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
+
+  window.addEventListener('load', () => {
+  // cria sobreposição escura
+  const overlay = document.createElement('div');
+  Object.assign(overlay.style, {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(0,0,0,.7)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 9999
+  });
+
+  // caixa do popup
+  const box = document.createElement('div');
+  Object.assign(box.style, {
+    background: '#111',
+    color: '#fff',
+    padding: '2rem 3rem',
+    borderRadius: '8px',
+    textAlign: 'center',
+    fontFamily: 'Arial, sans-serif'
+  });
+
+  const title = document.createElement('h2');
+  title.textContent = 'Resource loading process';
+
+  const btn = document.createElement('button');
+  btn.textContent = '...';
+  Object.assign(btn.style, {
+    marginTop: '1rem',
+    padding: '.7rem 1.5rem',
+    fontSize: '1rem',
+    fontWeight: '600',
+    cursor: 'pointer'
+  });
+
+  box.appendChild(title);
+  box.appendChild(btn);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+
+  btn.addEventListener('click', () => {
+    audio.play();
+    overlay.remove();
+  });
+});
 /* ========= Conexão ====================================================== */
  const socket = io({ query:{ role:'client' } });
 
