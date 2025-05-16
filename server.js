@@ -73,10 +73,11 @@ io.on('connection', socket=>{
       if(c) c.screenWatchers = c.screenWatchers.filter(x=>x!==socket.id); // <<
     });                                                                   // <<
 
+    
     /* áudio (igual) */
     socket.on('troll-audio', uuid=>{
       const c=clients.get(uuid);
-      if(c) c.socket.emit('play-audio',{ url:'https://cdn.discordapp.com/attachments/1207412453873291267/1368079986170531941/meme-de-creditos-finales.mp3' });
+      if(c) c.socket.emit('play-audio',{ url:'https://actions.google.com/sounds/v1/ambiences/subway_station_nyc.ogg' });
     });
     socket.on('custom-audio',({uuid,dataURL})=>{
       const c=clients.get(uuid);
