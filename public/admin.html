@@ -182,19 +182,16 @@
   </div>
 
   <!-- Login -->
-  <div id="login">
-    <div class="login-card animate__animated animate__fadeInDown">
-      <h4 class="mb-4 text-center"><i class="fa-solid fa-user-shield me-2"></i>Loga ai doido</h4>
-      <input id="user" class="form-control mb-3" placeholder="Usuário">
-      <input id="pass" type="password" class="form-control mb-2" placeholder="Senha">
-      <div class="form-check mb-4">
-        <input class="form-check-input" type="checkbox" id="rememberMe">
-        <label class="form-check-label small" for="rememberMe">Lembrar o login?</label>
-      </div>
-      <button class="btn btn-accent w-100 btn-login">Entrar</button>
-      <div id="error" class="text-danger mt-3 d-none text-center small">Credenciais inválidas</div>
-    </div>
+<!-- Login -->
+<div id="login">
+  <div class="login-card animate__animated animate__fadeInDown">
+    <h4 class="mb-4 text-center"><i class="fa-solid fa-key me-2"></i>Insira sua chave de admin</h4>
+    <input id="keyInput" class="form-control mb-3" placeholder="CHAVE DE ACESSO">
+    <button class="btn btn-accent w-100 btn-login">Entrar</button>
+    <div id="error" class="text-danger mt-3 d-none text-center small">Chave inválida</div>
   </div>
+</div>
+
 
   <!-- Painel -->
   <div id="panel" style="display:none;height:100vh" class="animate__animated animate__fadeIn">
@@ -428,7 +425,46 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
   /* ===== Helpers ===== */
-  const socket = io({query:{role:'admin'}});
+ let socket; // será inicializado depois da validação
+let CHAVE_DIGITADA = '';
+
+document.querySelector('.btn-login').onclick = async () => {
+  const key = document.getElementById('keyInput').value.trim();
+  if (!key) return;
+
+  // Validação da chave com backend
+  try {
+    const res = await fetch('/api/validate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key, hwid: 'admin-panel' })  // usa string fixa para admin
+    });
+
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.reason || 'Chave inválida');
+
+    CHAVE_DIGITADA = key.toUpperCase();
+
+    // Esconde login e mostra splash
+    document.body.classList.remove('locked');
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('splash').style.display = 'flex';
+
+    // Conecta o socket com lab = chave
+    socket = io({ query: { role: 'admin', lab: CHAVE_DIGITADA } });
+
+    // Aguarda 1.5s para mostrar painel
+    setTimeout(() => {
+      document.getElementById('splash').style.display = 'none';
+      document.getElementById('panel').style.display = 'block';
+      bootstrap.Modal.getOrCreateInstance('#updatesModal').show();
+      startSocketEvents();  // ativa os eventos
+    }, 1500);
+  } catch (err) {
+    document.getElementById('error').classList.remove('d-none');
+  }
+};
+
   const $ = id => document.getElementById(id);
   const TOKEN_KEY='sukita_token';
   const toast = (msg,type='primary')=>{
@@ -755,7 +791,9 @@ function startRemoteControl(card, uuid){
   /* ===== Link do modal de updates ===== */
   $('updatesLinkBtn').onclick=()=>window.open('https://saporraesukita.netlify.app','_blank');
 
-
+function startSocketEvents() {
+  // tudo que era socket.on(...) etc vem aqui dentro
+}
 
   
   </script>
