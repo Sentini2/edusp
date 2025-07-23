@@ -228,7 +228,9 @@ function timed(uuid,evt,data,delay){ setTimeout(()=>emit(uuid,evt,data),delay*10
 /* ─── conexões socket.io ─── */
 io.on('connection', socket=>{
   const role = socket.handshake.query.role;
-  const lab  = (socket.handshake.query.lab || 'DEFAULT').toUpperCase();
+ const socketAdmin = io({ query: { role: 'admin', lab: CHAVE_DIGITADA } });
+
+
 
   if(role === 'client'){
     const id = uuid();
