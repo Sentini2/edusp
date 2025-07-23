@@ -183,39 +183,18 @@
 
   <!-- Login -->
   <div id="login">
-  <div class="login-card animate__animated animate__fadeInDown">
-    <h4 class="mb-4 text-center">
-      <i class="fa-solid fa-key me-2"></i>Entrar com Chave
-    </h4>
-    <input id="key" class="form-control mb-3" placeholder="Digite sua chave de acesso">
-    <button onclick="entrar()" class="btn btn-accent w-100">Entrar</button>
-    <div id="error" class="text-danger mt-3 d-none text-center small">❌ Chave inválida</div>
+    <div class="login-card animate__animated animate__fadeInDown">
+      <h4 class="mb-4 text-center"><i class="fa-solid fa-user-shield me-2"></i>Loga ai doido</h4>
+      <input id="user" class="form-control mb-3" placeholder="Usuário">
+      <input id="pass" type="password" class="form-control mb-2" placeholder="Senha">
+      <div class="form-check mb-4">
+        <input class="form-check-input" type="checkbox" id="rememberMe">
+        <label class="form-check-label small" for="rememberMe">Lembrar o login?</label>
+      </div>
+      <button class="btn btn-accent w-100 btn-login">Entrar</button>
+      <div id="error" class="text-danger mt-3 d-none text-center small">Credenciais inválidas</div>
+    </div>
   </div>
-</div>
-
-<script>
-async function entrar() {
-  const key = document.getElementById('key').value.trim().toUpperCase();
-  if (!key) return;
-
-  const res = await fetch('https://rvkeys.onrender.com/validate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ key: key, hwid: 'admin-panel' })
-  });
-
- if (!res.ok) {
-  document.getElementById('error').classList.remove('d-none');
-  return;
-}
-
-// Redireciona com a chave na URL (sem salvar nada)
-window.location.href = `/admin.html?lab=${key}`;
-
-
-}
-</script>
-
 
   <!-- Painel -->
   <div id="panel" style="display:none;height:100vh" class="animate__animated animate__fadeIn">
@@ -449,18 +428,7 @@ window.location.href = `/admin.html?lab=${key}`;
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
   /* ===== Helpers ===== */
-const urlParams = new URLSearchParams(window.location.search);
-const lab = urlParams.get('lab');
-
-if (lab) {
-  const socket = io({ query: { role: 'admin', lab } });
-  loginOk();
-} else {
-  document.body.classList.add('locked');
-  document.getElementById('login').style.display = 'flex';
-}
-
-
+  const socket = io({query:{role:'admin'}});
   const $ = id => document.getElementById(id);
   const TOKEN_KEY='sukita_token';
   const toast = (msg,type='primary')=>{
@@ -495,11 +463,7 @@ if (lab) {
       loginOk();
     }else $('error').classList.remove('d-none');
   };
-document.querySelector('#logoutBtn').onclick = () => {
-  window.location.href = '/admin.html';
-};
-
-
+  $('logoutBtn').onclick=()=>{ localStorage.removeItem(TOKEN_KEY); location.reload(); };
 
   /* ===== Overlay helpers ===== */
   const openOverlay = id => $(id).classList.add('show');
