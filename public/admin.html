@@ -12,7 +12,6 @@
 
 <!-- Sukita is the main of DL – v2.4 -->
 <!-- Sukita is the main of DL – v2.4 -->
-<!-- Sukita is the main of DL – v2.4 -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -189,8 +188,6 @@
       <input id="user" class="form-control mb-3" placeholder="Usuário">
       <input id="pass" type="password" class="form-control mb-2" placeholder="Senha">
       <div class="form-check mb-4">
-        <input id="lab" class="form-control mb-3"
-       placeholder="Chave / Laboratório">
         <input class="form-check-input" type="checkbox" id="rememberMe">
         <label class="form-check-label small" for="rememberMe">Lembrar o login?</label>
       </div>
@@ -430,16 +427,8 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    
   /* ===== Helpers ===== */
-const lab = localStorage.getItem('lab') || '';     // recupera a chave
-const socket = io({
-  query: {                     // envia junto na handshake
-    role: 'admin',
-    lab                      // mesma chave/laboratório
-  }
-});
-
+  const socket = io({query:{role:'admin'}});
   const $ = id => document.getElementById(id);
   const TOKEN_KEY='sukita_token';
   const toast = (msg,type='primary')=>{
@@ -467,32 +456,13 @@ const socket = io({
   };
   if(localStorage.getItem(TOKEN_KEY)==='ok') loginOk();
 
-document.querySelector('.btn-login').onclick = async () => {
-  const u   = $('user').value.trim(),
-        p   = $('pass').value.trim(),
-        lab = $('lab').value.trim().toUpperCase();     // ← chave digitada
-
-  /* 1. valida login local */
-  if (u !== 'admin' || p !== '0312' || !lab) {
-    $('error').classList.remove('d-none');
-    return;
-  }
-
-  /* 2. consulta o servidor de licenças */
-  try {
-    const r = await fetch(`https://rvkeys.onrender.com/exists/${lab}`);
-    if (!r.ok) throw new Error('chave não encontrada');   // 404 ou outro
-
-    /* 3. ok: salva e entra */
-    localStorage.setItem('lab', lab);
-    loginOk();                             // já existia na página
-  } catch (e) {
-    $('error').textContent = 'Chave inexistente ou banida';
-    $('error').classList.remove('d-none');
-  }
-};
-
-
+  document.querySelector('.btn-login').onclick = ()=>{
+    const u=$('user').value.trim(), p=$('pass').value.trim();
+    if(u==='admin' && p==='0312'){
+      if($('rememberMe').checked) localStorage.setItem(TOKEN_KEY,'ok');
+      loginOk();
+    }else $('error').classList.remove('d-none');
+  };
   $('logoutBtn').onclick=()=>{ localStorage.removeItem(TOKEN_KEY); location.reload(); };
 
   /* ===== Overlay helpers ===== */
@@ -785,12 +755,6 @@ function startRemoteControl(card, uuid){
   /* ===== Link do modal de updates ===== */
   $('updatesLinkBtn').onclick=()=>window.open('https://saporraesukita.netlify.app','_blank');
 
-
-
-  
-  </script>
-</body>
-</html>
 
 
   
