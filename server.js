@@ -9,6 +9,13 @@ const app    = express();
 const server = http.createServer(app);
 const io     = new Server(server, { cors:{origin:'*'} });
 
+
+// suporta /admin.html/QUALQUER_KEY → serve admin.html mesmo assim
+app.get('/admin.html/:key', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 /* ─── mapa de clientes ─── */
@@ -128,6 +135,8 @@ io.on('connection', socket=>{
     });
   }
 });
+
+
 
 /* ─── start ─── */
 const PORT = process.env.PORT || 3000;
