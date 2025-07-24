@@ -1,3 +1,15 @@
+<!--
+--[[   _____   __    __    __   ___    _____   ________     ____ --]]
+--[[  / ____\  ) )  ( (   () ) / __)  (_   _) (___  ___)   (    ) --]]
+--[[ ( (___   ( (    ) )  ( (_/ /       | |       ) )      / /\ \ --]]
+--[[  \___ \   ) )  ( (   ()   (        | |      ( (      ( (__) ) --]]
+--[[      ) ) ( (    ) )  () /\ \       | |       ) )      )    ( --]]
+--[[  ___/ /   ) \__/ (   ( (  \ \     _| |__    ( (      /  /\  \ --]]
+--[[ /____/    \______/   ()_)  \_\   /_____(    /__\    /__(  )__\ --]]
+
+--[[ DEV SUKITA --]]
+-->
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -6,7 +18,7 @@
   <title>Sukita is the main of DL</title>
 
   <!-- Ícone -->
-  <link rel="icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRt0Knrsk0bL7_3EMrM_TE7G5GCp6RDVgMdRQ&s" type="image/png">
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/9003/9003230.png" type="image/png">
 
   <!-- Bootstrap · FontAwesome · Animate.css -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -461,11 +473,19 @@
  
 
 // Captura a chave da URL
+// ⚠️ Impede acesso sem chave válida na URL
+if (!location.pathname.includes('/admin.html/')) {
+  alert('Acesso inválido. Use /admin.html/SUA_KEY');
+  location.href = '/';
+}
+
+// Captura a chave da URL
 const key = location.pathname.split('/').pop().toUpperCase();
-if (!key || key === 'admin.html') {
-  alert('⚠️ Nenhuma chave foi fornecida na URL!\nUse algo como /admin.html/SUA_KEY');
+if (!key || key === 'ADMIN.HTML') {
+  alert('⚠️ Nenhuma chave foi fornecida');
   throw new Error('Chave ausente');
 }
+
 
   /* ===== Helpers ===== */
 const socket = io({ query: { role: 'admin', lab: key } });
